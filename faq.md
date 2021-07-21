@@ -24,6 +24,10 @@
 - [Is there any impact for my application?](#is-there-any-impact-for-my-application)
 - [Is there any impact for my application's users?](#is-there-any-impact-for-my-applications-users)
 
+## Cost
+
+- [Is there any cost impact?](#is-there-any-cost-impact)
+
 ### Which accounts will be migrated?
 
 This migration project concerns all the accounts created by DIGIT with hotmail account (acp4euXXX@hotmail.com and acpcloudXXX@hotmail.com). Additional accounts linked to Azure AD owned by the customer will not be impacted by this migration project.
@@ -36,7 +40,7 @@ This question is currently under investigation with Microsoft.
 
 No. The scope of this migration project is only the subscription and will not have any impact on the existing M365 users.
 
-### Will Azure AD application be migrated?
+### Will Azure AD applications be migrated?
 
 All information related to Azure AD application will be gathered by the script and an application will be recreated in the new account with the exact same information and rights. However, some information do not support migration and must be updated manually. This includes:
 
@@ -77,6 +81,10 @@ Mostly No. If you're running an IaaS or PaaS application, this one will remain a
 * If the application uses a managed identity or Azure AD application, this one will not work until recreated
 * If the application uses external connectors (Microsoft Teams, Office365, ...), those may need some reconfiguration.
 
-### Is there any impact for the application's users?
+### Is there any impact for my application's users?
 
 No. If the application doesn't use any assets that require recreation/reconfiguration, there won't be any impact for the end-users.
+
+### Is there any cost impact?
+
+No. There is no cost impact associated with the migration of your Azure subscription. The price list and fee will remain the same after the migration is completed.
