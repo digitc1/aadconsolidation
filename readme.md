@@ -63,7 +63,7 @@ rm script.ps1
 ```
 
 ## Frequently Asked Questions
-Check our [Frequently Asked Questions](https://github.com/digitc1/aadconsolidation/FAQ.md) for additional information.
+Check our [Frequently Asked Questions](https://github.com/digitc1/aadconsolidation/blob/main/faq.md) for additional information.
 
 ## Contribute
 These scripts have been created by European Commission (DIGIT) and Microsoft and are intended to be used by the European Commission only.
