@@ -34,7 +34,13 @@ This migration project concerns all the accounts created by DIGIT with hotmail a
 
 ### Will Azure DevOps Organization be migrated?
 
-This question is currently under investigation with Microsoft.
+Azure DevOps organization is a Microsoft SaaS product linked to the tenant and it will not be automatically migrated as part of the "aadconsolidation" project but it will be handled in a separate phase.
+
+The following considerations have to be addressed before the Azure DevOps organization can be migrated:
+
+- Users who are member in the source and destination account will keep their access to Azure DevOps organization. However, users who have not been invited to the target account will loose their accesses.
+- The code repository, build and deployment pipelines, artifacts, ... will be migrated to the target account.
+- The ssh key and tokens will be reset.
 
 ### Is there any impact for M365 users?
 
