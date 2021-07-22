@@ -30,15 +30,15 @@
 
 ### Which accounts will be migrated?
 
-This migration project concerns all the accounts created by DIGIT with hotmail account (acp4euXXX@hotmail.com and acpcloudXXX@hotmail.com). Additional accounts linked to Azure AD owned by the customer will not be impacted by this migration project.
+This migration project concerns all the accounts created by DIGIT for the Commission and Executive Agencies with hotmail account (acp4euXXX@hotmail.com and acpcloudXXX@hotmail.com). Additional accounts linked to Azure AD owned by the customer (ex: accounts in M365 tenants) will not be impacted by this migration project.
 
 ### Will Azure DevOps Organization be migrated?
 
-Azure DevOps organization is a Microsoft SaaS product linked to the tenant and it will not be automatically migrated as part of the "aadconsolidation" project but it will be handled in a separate phase.
+Azure DevOps organization is a Microsoft product linked to the tenant and it will not be automatically migrated as part of the "aadconsolidation" project but it will be handled at a second step of the migration.
 
 The following considerations have to be addressed before the Azure DevOps organization can be migrated:
 
-- Users who are member in the source and destination account will keep their access to Azure DevOps organization. However, users who have not been invited to the target account will loose their accesses.
+- Users who are member in the source and destination account will keep their access to Azure DevOps organization. However, users who have not been invited to the target account will lose their accesses.
 - The code repository, build and deployment pipelines, artifacts, ... will be migrated to the target account.
 - The ssh key and tokens will be reset.
 
@@ -54,12 +54,12 @@ All information related to Azure AD application will be gathered by the script a
 
 ### Is there any impact for the developers?
 
-Yes. During the entire migration process, the developers will not be able to login to the Azure portal anymore. The access to virtual machines (ssh, rdp) will remain during the entire process. The downtime can last for up to half a day.
+Yes. During the entire migration process, the developers will not be able to login to the Azure portal anymore. The access to virtual machines (ssh, rdp) will remain during the entire process. The downtime can last for up to _half a day_.
 
 ### Will all users be migrated?
 
 There are 3 possibilities that can arise:
-1. The user has a @ec.europa.eu account. In this case, the user will be migrated.
+1. The user has a @ec.europa.eu or @ext.ec.europa.eu account . In this case, the user will be migrated.
 1. The user connects with a local user account (@acp4euXXXhotmail.onmicrosoft.com). In this case, the user will be migrated if a corresponding @ec.europa.eu user can be found in the destination tenant. Otherwise, the user will not be migrated automatically and some additional manual steps will be required to complete the transition.
 1. The user connects with an external provider account (@company.com other than europa.eu). In this case, the user will not be migrated automatically and some additional manual steps will be required to complete the transition.
 
@@ -74,7 +74,7 @@ All non-EC users in the source account (local account) will be converted to EC u
 
 ### Will non-EC users have the same rights in Azure?
 
-External users can be added as guest or member and be granted access to the Azure portal. Some conditional access may be required to be able to connect (for instance, being part of the whitelisted providers).
+External users can be added as guest or member and be granted access to the Azure portal. Users should be generally added as guest (limited privileges) unless there's a good reason to add them as members (ex: an Azure DevOps administrator requires to be added as Member). Some conditional access may be required to be able to connect (for instance, being part of the whitelisted providers, using MFA etc).
 
 ### Will Azure resources be modified?
 
@@ -94,3 +94,4 @@ No. If the application doesn't use any assets that require recreation/reconfigur
 ### Is there any cost impact?
 
 No. There is no cost impact associated with the migration of your Azure subscription. The price list and fee will remain the same after the migration is completed.
+You might even have economies in case you want to purchase licenses (ex: Azure Active Directory P2) for users that used to be in two different tenants in the past (now you would need only one license as opposed to two).
