@@ -288,7 +288,7 @@ ForEach($AzADApp in $AzAdApps){
         #    $newPreAuthAppId = $preAuthApps.appId
         #    $newPreAuthDelpermid = $preAuthApps.delegatedpermissionids
 
-            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$AppId" --headers $headers --body '{"api":{"preAuthorizedApplications":[{"appId":"$newPreAuthAppId","delegatedPermissionIds":"$newPreAuthDelpermid"]}]}}'   
+            #az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$AppId" --headers $headers --body '{"api":{"preAuthorizedApplications":[{"appId":"$newPreAuthAppId","delegatedPermissionIds":"$newPreAuthDelpermid"]}]}}'   
             #az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$AppId/api/preAuthorizedApplications" --headers $headers --body '{"appId":"$newPreAuthAppId","delegatedPermissionIds":["$newPreAuthDelpermid"]}'
          
             #$newPreAuthApp = 'System.Collections.Generic.List[Microsoft.Open.MSGraph.Model.PreAuthorizedApplication]'
