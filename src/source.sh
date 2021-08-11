@@ -35,6 +35,7 @@ apps=$(az ad app list --query [].objectId --output tsv)
 for i in $apps
 do
 	az ad app owner list --id $i > "application-$i.json"
+	az rest --method GET --uri "https://graph.microsoft.com/v1.0/applications/$i" > "appmanifest-$i.json"
 done
 
 # Save all role assignments, including inherited role assignments and export the output to json
