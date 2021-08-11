@@ -43,7 +43,7 @@ Once the script completed, click on the download button and enter the name "aadm
 ![This is a alt text.](/images/download3.png "Picture showing how to download files.")
 
 ### Target account
-In the source account, open a new shell session and ensure the Azure Shell is using PowerShell.
+In the target account, open a new shell session and ensure the Azure Shell is using PowerShell.
 
 ![This is a alt text.](/images/open-cli.png "Picture showing how to open Azure Shell.")
 
