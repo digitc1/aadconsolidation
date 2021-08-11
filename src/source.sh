@@ -64,6 +64,11 @@ az sql server ad-admin list --ids $(az graph query -q "resources | where type ==
 subscription=$(az account show --query id | sed -e 's/^"//' -e 's/"$//')
 az graph query -q "resources | where type != 'microsoft.azureactivedirectory/b2cdirectories' | where identity <> '' or properties.tenantId <> '' or properties.encryptionSettingsCollection.enabled == true | project name, type, kind, identity, tenantId, properties.tenantId" --subscriptions $subscription --output json > aaddependencies.json
 
+uri="https://management.azure.com/providers/microsoft.aadiam/diagnosticSettings?api-version=2017-04-01"
+az rest --method GET --uri $uri > dataexport.json
+ids=$(az rest --method GET --uri $uri --query value[].id --output tsv)
+for id in $ids ; do az rest --method DELETE --uri "https://management.azure.com/$id?api-version=2017-04-01"; done
+
 cd ../
 tar -cvzf aadmigration.tar.gz aadmigration
 
