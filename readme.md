@@ -27,8 +27,7 @@ If the Azure Shell uses PowerShell by default, click on the switch button to swi
 In Azure CLI, run the following code:
 
 ```
-# TODO: Replace with actual url
-curl http://some.url --output script.sh
+curl https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/source.sh --output script.sh
 chmod +x script.sh
 ./script.sh
 rm script.sh
@@ -56,8 +55,7 @@ Upload the archive created by running the script on the source account
 In Azure Shell, run the following code:
 
 ```
-# TODO: Replace with actual url
-Invoke-WebRequest -URI http://some.url -OutFile script.ps1
+Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target.ps1 -OutFile script.ps1
 ./script.ps1
 rm script.ps1
 ```
