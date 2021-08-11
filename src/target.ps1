@@ -72,7 +72,7 @@ ForEach($AzADApp in $AzAdApps){
 			    If($ref -like "*$AppName*"){
 				$OldOId = $Ref.split("`t")[0]
 				Write-host $OldOId
-				$BackupFile = Get-childitem -Path . | where{$_.name -like "*$oldOid*"} 
+				$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
 				$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
 				If(($BackupAppOwner -eq $null) -Or ($BackupAppOwner.userPrincipalName -eq $null)){
 				    Write-Host "Azure Ad app $AppName has no owner assigned."
