@@ -56,6 +56,8 @@ In Azure Shell, run the following code:
 
 ```
 Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target.ps1 -OutFile script.ps1
+Connect-AzureAD
+az login
 ./script.ps1
 rm script.ps1
 ```
