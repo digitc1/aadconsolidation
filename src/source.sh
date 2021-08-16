@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Switch to the correct subscription
-if az account set --subscription $1 ; then
+if az account set --subscription "$1" ; then
 	echo "Subscription successfully loaded"
 else
 	echo "Error using subscriptionId, halting execution" && exit 1
