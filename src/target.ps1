@@ -68,9 +68,9 @@ ForEach($AzADApp in $AzAdApps){
         ForEach($ref in $AzAdRef){
 		if(($ref -notlike "*RunAsAccount*") -And ($ref -notlike "*lzslzAutomation*") -And ($ref -ne "OptionalClaimsApp") -And ($ref -notlike "*aad-extension-app*") -And ($ref -notlike "*Learn On Demand*") -And ($ref -notlike "*Tenant Schema Extension App*") -And ($ref -notlike "*Cost-Monitor-Account*")){
 			$AppName = $Ref.split("`t")[1]
-			$AppName.Trim()
+			$AppName=$AppName.Trim()
 			Write-host $AppName
-			    If($ref.split("`t")[1] -eq "$AppName"){
+			    If($ref.split("`t")[1] -eq $NewApp.DisplayName){
 				$OldOId = $Ref.split("`t")[0]
 				Write-host $OldOId
 				$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
