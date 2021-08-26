@@ -53,6 +53,7 @@ $tenantId = (Get-azcontext).Tenant.id
 $TenantName = Get-AzTenant | where{$_.id -eq $tenantId}
 $AzAdApps = Get-Content AADapplications.json | ConvertFrom-Json
 $AzAdRef = Get-content aadappref.json
+$newAppsIds = @{}
 
 ForEach($AzADApp in $AzAdApps){
     if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
@@ -265,51 +266,7 @@ ForEach($AzADApp in $AzAdApps){
             }
         
         Start-sleep -seconds 15
-
-        #REST API call for PreAuthorizedApplication oAuth2 permissions
-        #$context = Get-AzContext
-        #$tenantId = $context.Tenant.Id
-        
-        #$token = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::Instance.AuthenticationFactory.Authenticate($context.Account, $context.Environment, $TenantId, $null, "Never", #$null, "https://graph.microsoft.com/")
-        #$headers = @{
-        #  'Authorization' = 'Bearer ' + $token.AccessToken
-        #  'Content-Type' = 'application/json'
-        #  'X-Requested-With'= 'XMLHttpRequest'
-        #  'x-ms-client-request-id'= [guid]::NewGuid()
-        #  'x-ms-correlation-id' = [guid]::NewGuid()
-        #  }
-        
-        #$AppId = $NewApp.ObjectID
-        #$url = "https://graph.microsoft.com/v1.0/applications/$AppId"
-        #$preAuthApps = Invoke-RestMethod -Uri $url -Headers $headers -Method GET -ErrorAction Stop
-        #$preAuthApps = $preAuthApps.api.preauthorizedapplications
-
-        #ForEach($config in $preAuthApps){
-        #    $newPreAuthAppId = $preAuthApps.appId
-        #    $newPreAuthDelpermid = $preAuthApps.delegatedpermissionids
-
-            #az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$AppId" --headers $headers --body '{"api":{"preAuthorizedApplications":[{"appId":"$newPreAuthAppId","delegatedPermissionIds":"$newPreAuthDelpermid"]}]}}'   
-            #az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$AppId/api/preAuthorizedApplications" --headers $headers --body '{"appId":"$newPreAuthAppId","delegatedPermissionIds":["$newPreAuthDelpermid"]}'
-         
-            #$newPreAuthApp = 'System.Collections.Generic.List[Microsoft.Open.MSGraph.Model.PreAuthorizedApplication]'
-            #Set-azureadapplication -ObjectId $NewApp.ObjectId -PreAuthorizedApplications $newPreAuthApp
-        #}
-        
-        
-        #App Id in below command (74658136-14ec-4630-ad9b-26e160ff0fc6), used previously instead of management url, is for https://main.iam.ad.ext.azure.com but doesn't work in Azure CLI
-        #Below command was updated to use the management URL
-        #$token = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::Instance.AuthenticationFactory.Authenticate($context.Account, $context.Environment, $TenantId, $null, "Never", $null, "https://graph.windows.net/")
-        #$headers = @{
-        #  'Authorization' = 'Bearer ' + $token.AccessToken
-        #  'X-Requested-With'= 'XMLHttpRequest'
-        #  'x-ms-client-request-id'= [guid]::NewGuid()
-        #  'x-ms-correlation-id' = [guid]::NewGuid()
-        #  }
-        #
-        #$AppId = $NewApp.AppId
-        #$url = "https://main.iam.ad.ext.azure.com/api/RegisteredApplications/$AppId/Consent?onBehalfOfAll=true"
-        #Invoke-RestMethod -Uri $url -Headers $headers -Method POST -ErrorAction Stop
-
+	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
 		
@@ -321,7 +278,39 @@ ForEach($AzADApp in $AzAdApps){
         }
 
         #Write-Host "Admin Consent Granted to Azure AD application" -BackgroundColor Green -Foregroundcolor Black
+	$newAppsIds.add("$AzADApp.appId",$newApp)
     }
+}
+
+ForEach($AzADApp in $AzAdApps){
+	if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
+
+		Write-host "Recreating Azure AD PreAuthorizedApplication oAuth2 permissions"$AzAdApp.DisplayName
+
+		#REST API call for PreAuthorizedApplication oAuth2 permissions
+
+		$oldAzAdManifest = Get-Content "appmanifest-$AzAdApp.ObjectId.json" | ConvertFrom-Json
+
+		if($oldAzAdManifest.api.preAuthorizedApplications.count -gt 0){
+			$requestBody="{\""api\"": {\""preAuthorizedApplications\"": ["
+			ForEach($preAuthApp in $oldAzAdManifest.api.preAuthorizedApplications){
+				$oldPreAuthAppId=$preAuthApp.appId
+				if($newAppsIds.ContainsKey($oldPreAuthAppId)){
+					$newPreAuthAppId = $newAppsIds.$oldPreAuthAppId.appId
+				}else{
+					$newPreAuthAppId = $oldPreAuthAppId
+				}
+				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
+				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]}"
+				}else{
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]},"
+				}
+			}
+			$requestBody+="]}}"
+			az rest --method PATCH --url "https://graph.microsoft.com/v1.0/applications/$($newAppsIds.($AzADApp.appId).ObjectId)" --body $requestBody
+		}			
+	}
 }
 
 #Recreate User assigned identities
