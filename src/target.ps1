@@ -289,7 +289,7 @@ ForEach($AzADApp in $AzAdApps){
 
 		#REST API call for PreAuthorizedApplication oAuth2 permissions
 
-		$oldAzAdManifest = Get-Content "appmanifest-$AzAdApp.ObjectId.json" | ConvertFrom-Json
+		$oldAzAdManifest = Get-Content "appmanifest-$($AzAdApp.ObjectId).json" | ConvertFrom-Json
 
 		if($oldAzAdManifest.api.preAuthorizedApplications.count -gt 0){
 			$requestBody="{\""api\"": {\""preAuthorizedApplications\"": ["
