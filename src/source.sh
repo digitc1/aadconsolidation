@@ -38,12 +38,31 @@ do
 	az rest --method GET --uri "https://graph.microsoft.com/v1.0/applications/$i" > "appmanifest-$i.json"
 done
 
+# Get all Azure AD conditional access policies
+az rest --method GET --uri "https://graph.microsoft.com/v1.0/identity/conditionalaccess/policies" > AzADCAP.json
+
+# Get all Azure AD application proxy applications
+az ad sp list --query "[?contains(tags,'WindowsAzureActiveDirectoryOnPremApp')]" --all > azadappproxyapps.json
+
 #Save all Azure AD role assignments
 ids=$(az rest --method GET --uri "https://graph.microsoft.com/v1.0/directoryroles" --query value[].roleTemplateId --output tsv)
 for id in $ids; 
 do
 	az rest --method GET --uri "https://graph.microsoft.com/v1.0/directoryroles/roleTemplateId=$id/members" > "azADRole-$id.json"
 done
+
+# Get All Administrative Units
+az rest --method GET --uri "https://graph.microsoft.com/v1.0/directory/administrativeunits" > AzAdAU.json
+
+# Get All members of the Administrative units (users and groups)
+AUs=$(az rest --method GET --uri "https://graph.microsoft.com/v1.0/directory/administrativeunits" --query value[].id --output tsv)
+for i in $AUs;
+do
+az rest --method GET --uri "https://graph.microsoft.com/v1.0/directory/administrativeunits/$i/members" > "AU-$i-members.json"
+done
+
+# Get External Collaboration settings - Backup only
+az rest --method GET --uri "https://graph.microsoft.com/beta/legacy/policies" | jq '.value[] | select(.definition[] | contains ("InvitationsAllowedAndBlockedDomainsPolicy"))' > InvitationsAllowedAndBlockedDomainsPolicy.json
 
 # Save all role assignments, including inherited role assignments and export the output to json
 az role assignment list --all --include-inherited --output json > roleassignments.json
