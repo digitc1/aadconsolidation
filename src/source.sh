@@ -38,6 +38,13 @@ do
 	az rest --method GET --uri "https://graph.microsoft.com/v1.0/applications/$i" > "appmanifest-$i.json"
 done
 
+#Save all Azure AD role assignments
+ids=$(az rest --method GET --uri "https://graph.microsoft.com/v1.0/directoryroles" --query value[].roleTemplateId --output tsv)
+for id in $ids; 
+do
+	az rest --method GET --uri "https://graph.microsoft.com/v1.0/directoryroles/roleTemplateId=$id/members" > "azADRole-$id.json"
+done
+
 # Save all role assignments, including inherited role assignments and export the output to json
 az role assignment list --all --include-inherited --output json > roleassignments.json
 
