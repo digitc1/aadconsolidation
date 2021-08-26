@@ -70,7 +70,7 @@ ForEach($AzADApp in $AzAdApps){
 			$AppName = $Ref.split("`t")[1]
 			$AppName.Trim()
 			Write-host $AppName
-			    If($ref -like "*$AppName*"){
+			    If($ref.split("`t")[1] -eq "$AppName"){
 				$OldOId = $Ref.split("`t")[0]
 				Write-host $OldOId
 				$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
