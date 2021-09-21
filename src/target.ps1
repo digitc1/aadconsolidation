@@ -99,7 +99,7 @@ ForEach($AzADApp in $AzAdApps){
 					}
 				}           
 			    }Else{
-				Write-Host "Unable to find the app $AzAdApp in the json file."
+				Write-Host "Unable to find the app $($AzAdApp.displayName) in the json file."
 			    }
 	    	}
         }
