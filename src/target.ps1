@@ -66,44 +66,40 @@ ForEach($AzADApp in $AzAdApps){
         #Get-ObjectId of old App in json file
         #Add Application owner
         ForEach($ref in $AzAdRef){
-		if(($ref -notlike "*RunAsAccount*") -And ($ref -notlike "*lzslzAutomation*") -And ($ref -ne "OptionalClaimsApp") -And ($ref -notlike "*aad-extension-app*") -And ($ref -notlike "*Learn On Demand*") -And ($ref -notlike "*Tenant Schema Extension App*") -And ($ref -notlike "*Cost-Monitor-Account*")){
-			$AppName = $Ref.split("`t")[1]
-			$AppName=$AppName.Trim()
-			Write-host $AppName
-			    If($ref.split("`t")[1] -eq $NewApp.DisplayName){
-				$OldOId = $Ref.split("`t")[0]
-				Write-host $OldOId
-				$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
-				$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
-				If(($BackupAppOwner -eq $null)){
-				    Write-Host "Azure Ad app $AppName has no owner assigned."
-				}Else{
-					ForEach($owner in $Backupowner){
-						 if($owner.userPrincipalName -eq $null){
-						 	Write-Host "Azure Ad app $AppName has no owner assigned."
-						 }else{
-						    Write-Host "Owner of the application is" $owner.userPrincipalName
-						    $ownerObjectId = (Get-AzADUser | Where {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
-						    if($ownerObjectId -eq $null){
-							   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
-						    }Else{
-							$currentOwner=Get-AzureADApplicationOwner -objectId $newapp.ObjectId
-							if($currentOwner.ObjectId -ne $ownerObjectId){
-							   Add-AzureADApplicationOwner -ObjectId $newapp.ObjectId -RefObjectId $ownerObjectId 
-							   Write-host "Added $ownerObjectId as owner of the Azure AD app." -ForegroundColor Green 
-							}else{
-								Write-host "Correct owner is already assigned to AzADApp" -ForegroundColor Green 
-							}
-						    }
-						  }
-					}
-				}           
-			    }Else{
-				Write-Host "Unable to find the app $($AzAdApp.displayName) in the json file."
-			    }
-	    	}
-        }
-
+			if(($ref -notlike "*RunAsAccount*") -And ($ref -notlike "*lzslzAutomation*") -And ($ref -ne "OptionalClaimsApp") -And ($ref -notlike "*aad-extension-app*") -And ($ref -notlike "*Learn On Demand*") -And ($ref -notlike "*Tenant Schema Extension App*") -And ($ref -notlike "*Cost-Monitor-Account*")){
+				$AppName = $Ref.split("`t")[1]
+				$AppName=$AppName.Trim()
+				If($ref.split("`t")[1] -eq $NewApp.DisplayName){
+					$OldOId = $Ref.split("`t")[0]
+					Write-host $OldOId
+					$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
+					$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
+					If(($BackupAppOwner -eq $null)){
+						Write-Host "Azure Ad app $AppName has no owner assigned."
+					}Else{
+						ForEach($owner in $BackupAppOwner){
+							 if($owner.userPrincipalName -eq $null){
+								Write-Host "Azure Ad app $AppName has no owner assigned."
+							 }else{
+								Write-Host "Owner of the application is" $owner.userPrincipalName
+								$ownerObjectId = (Get-AzADUser | Where {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+								if($ownerObjectId -eq $null){
+								   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
+								}Else{
+									$currentOwner=Get-AzureADApplicationOwner -objectId $newapp.ObjectId
+									if($currentOwner.ObjectId -ne $ownerObjectId){
+									   Add-AzureADApplicationOwner -ObjectId $newapp.ObjectId -RefObjectId $ownerObjectId 
+									   Write-host "Added $ownerObjectId as owner of the Azure AD app." -ForegroundColor Green 
+									}else{
+										Write-host "Correct owner is already assigned to AzADApp" -ForegroundColor Green 
+									}
+								}
+							  }
+						}
+					}           
+				}
+			}
+		}
         #Add ReplyUrls
         $ReplyURLs = $AzADApp.ReplyUrls
 
