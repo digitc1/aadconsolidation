@@ -186,8 +186,12 @@ ForEach($AzADApp in $AzAdApps){
         #Recreate Token Configuration
         $claims = $AzADApp.OptionalClaims
         If(!(($claims.AccessToken -eq $null) -and ($claims.IdToken -eq $null) -and ($claims.SamlToken -eq $null))){
-            Set-AzureADapplication -ObjectId $newApp.objectid -OptionalClaims $claims
-            Write-host "Recreated Token configuration" -ForegroundColor Green
+		$tmp = New-Object -TypeName Microsoft.Open.AzureAD.Model.OptionalClaims
+		$tmp.AccessToken = $claims.AccessToken
+		$tmp.IdToken = $claims.IdToken
+		$tmp.SamlToken = $claims.SamlToken
+		Set-AzureADapplication -ObjectId $newApp.objectid -OptionalClaims $tmp
+            	Write-host "Recreated Token configuration" -ForegroundColor Green
         }Else{
             Write-host "No token configuration to be recreated."
         }
