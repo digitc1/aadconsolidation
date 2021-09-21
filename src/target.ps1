@@ -279,7 +279,7 @@ ForEach($AzADApp in $AzAdApps){
 		
         Try{
             az ad app permission admin-consent --id $AppId
-            Write-Host "Admin Consent Granted to Azure AD application" -Foregroundcolor Black -BackgroundColor Green -NoNewLine
+            Write-Host "Admin Consent Granted to Azure AD application" -Foregroundcolor Black -BackgroundColor Green
         }catch{
             Write-host "Admin consent failed due to $err"
         }
