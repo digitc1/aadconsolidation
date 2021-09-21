@@ -278,12 +278,10 @@ ForEach($AzADApp in $AzAdApps){
         }
 
         #Write-Host "Admin Consent Granted to Azure AD application" -BackgroundColor Green -Foregroundcolor Black
-	$newAppsIds.add("$AzADApp.appId",$newApp)
+	$newAppsIds.add($AzADApp.appId,$newApp)
     }
 }
-ForEach($aTest in $newAppsIds){
-	Write-Host $aTest
-}
+
 ForEach($AzADApp in $AzAdApps){
 	if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
 
