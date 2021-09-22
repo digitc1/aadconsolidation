@@ -275,7 +275,14 @@ ForEach($AzADApp in $AzAdApps){
             }Catch{
                 Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
             }
-        
+
+	If(!($AzAdApp.identifierUris -eq $null)){
+		$AppUriID = "api://" + [guid]::NewGuid()
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris $AppUriId
+	} else {
+		Write-Host "No identifier URI specified" -ForegroundColor Green
+	}
+
         Start-sleep -seconds 15
 	
         #AZ Cli call test for admin consent
