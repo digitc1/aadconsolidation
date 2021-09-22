@@ -227,7 +227,7 @@ ForEach($AzADApp in $AzAdApps){
         Try{
             If(!($AzAdApp.identifierUris -eq $null)){
 		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
-		Write-Host "Added the identifier Uri: " $AzAdApp.IdentifierUris -ForegroundColor Green
+		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
 	    } else {
 			Write-Host "No identifier URI specified" -ForegroundColor Green
 	    }
@@ -315,8 +315,7 @@ ForEach($AzADApp in $AzAdApps){
 					Write-Host "Preauthapp step 2"
 					Write-Host $newPreAuthAppId
 				}
-				$newAzureAdAppOAuth2PermId = (Get-AzureAdApplication -objectId (Get-AzADApplication -ApplicationId $newPreAuthAppId).objectId | Select -ExpandProperty Oauth2Permissions).Id
-				#$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
+				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
 					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]}"
 				}else{
