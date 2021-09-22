@@ -311,7 +311,8 @@ ForEach($AzADApp in $AzAdApps){
 				}else{
 					$newPreAuthAppId = $oldPreAuthAppId
 				}
-				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
+				$newAzureAdAppOAuth2PermId = (Get-AzureAdApplication -objectId (Get-AzADApplication -ApplicationId $oldPreAuthAppId).objectId | Select -ExpandProperty Oauth2Permissions).Id
+				#$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
 					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]}"
 				}else{
