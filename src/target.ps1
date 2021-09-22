@@ -312,6 +312,8 @@ ForEach($AzADApp in $AzAdApps){
 			$requestBody="{\""api\"": {\""preAuthorizedApplications\"": ["
 			ForEach($preAuthApp in $oldAzAdManifest.api.preAuthorizedApplications){
 				$oldPreAuthAppId=$preAuthApp.appId
+				Write-Host "Before preauth step"
+				Write-Host $oldPreAuthAppId
 				if($newAppsIds.ContainsKey($oldPreAuthAppId)){
 					$newPreAuthAppId = $newAppsIds.$oldPreAuthAppId.appId
 					Write-Host "Preauthapp step 1"
