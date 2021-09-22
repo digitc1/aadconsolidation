@@ -309,6 +309,7 @@ ForEach($AzADApp in $AzAdApps){
 		$oldAzAdManifest = Get-Content "appmanifest-$($AzAdApp.ObjectId).json" | ConvertFrom-Json
 
 		if($oldAzAdManifest.api.preAuthorizedApplications.count -gt 0){
+			Write-Host "entering loop"
 			$requestBody="{\""api\"": {\""preAuthorizedApplications\"": ["
 			ForEach($preAuthApp in $oldAzAdManifest.api.preAuthorizedApplications){
 				$oldPreAuthAppId=$preAuthApp.appId
