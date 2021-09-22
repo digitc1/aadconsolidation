@@ -233,8 +233,12 @@ ForEach($AzADApp in $AzAdApps){
 
         #Exposed API's
         Try{
-            Set-azureadapplication -ObjectId $newapp.objectid -IdentifierUris $AzADApp.IdentifierUris
-            Write-Host "Added the identifier Uri: " $AzAdApp.IdentifierUris -ForegroundColor Green
+            If(!($AzAdApp.identifierUris -eq $null)){
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
+		Write-Host "Added the identifier Uri: " $AzAdApp.IdentifierUris -ForegroundColor Green
+	    } else {
+			Write-Host "No identifier URI specified" -ForegroundColor Green
+	    }
         }Catch{
             Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
         }
@@ -275,13 +279,6 @@ ForEach($AzADApp in $AzAdApps){
             }Catch{
                 Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
             }
-
-	If(!($AzAdApp.identifierUris -eq $null)){
-		Write-Host $newApp.AppId $newApp.DisplayName
-		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
-	} else {
-		Write-Host "No identifier URI specified" -ForegroundColor Green
-	}
 
         Start-sleep -seconds 15
 	
