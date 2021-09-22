@@ -277,6 +277,7 @@ ForEach($AzADApp in $AzAdApps){
             }
 
 	If(!($AzAdApp.identifierUris -eq $null)){
+		Write-Host $newApp.AppId $newApp.DisplayName
 		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
 	} else {
 		Write-Host "No identifier URI specified" -ForegroundColor Green
@@ -300,6 +301,7 @@ ForEach($AzADApp in $AzAdApps){
 }
 
 ForEach($AzADApp in $AzAdApps){
+	Write-Host "Start"
 	if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
 
 		Write-host "Recreating Azure AD PreAuthorizedApplication oAuth2 permissions"$AzAdApp.DisplayName
