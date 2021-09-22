@@ -277,7 +277,7 @@ ForEach($AzADApp in $AzAdApps){
             }
 
 	If(!($AzAdApp.identifierUris -eq $null)){
-		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.ApplicationId)"
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
 	} else {
 		Write-Host "No identifier URI specified" -ForegroundColor Green
 	}
