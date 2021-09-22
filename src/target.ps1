@@ -314,8 +314,12 @@ ForEach($AzADApp in $AzAdApps){
 				$oldPreAuthAppId=$preAuthApp.appId
 				if($newAppsIds.ContainsKey($oldPreAuthAppId)){
 					$newPreAuthAppId = $newAppsIds.$oldPreAuthAppId.appId
+					Write-Host "Preauthapp step 1"
+					Write-Host $newPreAuthAppId
 				}else{
 					$newPreAuthAppId = $oldPreAuthAppId
+					Write-Host "Preauthapp step 2"
+					Write-Host $newPreAuthAppId
 				}
 				$newAzureAdAppOAuth2PermId = (Get-AzureAdApplication -objectId (Get-AzADApplication -ApplicationId $newPreAuthAppId).objectId | Select -ExpandProperty Oauth2Permissions).Id
 				#$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
