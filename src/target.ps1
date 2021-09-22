@@ -279,7 +279,8 @@ ForEach($AzADApp in $AzAdApps){
 		
         Try{
             az ad app permission admin-consent --id $AppId
-            Write-Host "Admin Consent Granted to Azure AD application" -Foregroundcolor Black -BackgroundColor Green
+            Write-Host "Admin Consent Granted to Azure AD application" -Foregroundcolor Black -BackgroundColor Green -NoNewLine
+	    Write-Host " " 
         }catch{
             Write-host "Admin consent failed due to $err"
         }
@@ -300,20 +301,13 @@ ForEach($AzADApp in $AzAdApps){
 		$oldAzAdManifest = Get-Content "appmanifest-$($AzAdApp.ObjectId).json" | ConvertFrom-Json
 
 		if($oldAzAdManifest.api.preAuthorizedApplications.count -gt 0){
-			Write-Host "entering loop"
 			$requestBody="{\""api\"": {\""preAuthorizedApplications\"": ["
 			ForEach($preAuthApp in $oldAzAdManifest.api.preAuthorizedApplications){
 				$oldPreAuthAppId=$preAuthApp.appId
-				Write-Host "Before preauth step"
-				Write-Host $oldPreAuthAppId
 				if($newAppsIds.ContainsKey($oldPreAuthAppId)){
 					$newPreAuthAppId = $newAppsIds.$oldPreAuthAppId.appId
-					Write-Host "Preauthapp step 1"
-					Write-Host $newPreAuthAppId
 				}else{
 					$newPreAuthAppId = $oldPreAuthAppId
-					Write-Host "Preauthapp step 2"
-					Write-Host $newPreAuthAppId
 				}
 				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
