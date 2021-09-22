@@ -277,8 +277,7 @@ ForEach($AzADApp in $AzAdApps){
             }
 
 	If(!($AzAdApp.identifierUris -eq $null)){
-		$AppUriID = "api://" + [guid]::NewGuid()
-		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris $AppUriId
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.ApplicationId)"
 	} else {
 		Write-Host "No identifier URI specified" -ForegroundColor Green
 	}
