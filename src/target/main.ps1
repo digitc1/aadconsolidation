@@ -12,9 +12,9 @@ if(!($context)){
 	return
 }
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target.ps1" -OutFile $HOME/aad.ps1
-./aad.ps1
-Remove-Item -Path $HOME/aad.ps1
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target/set-aad.ps1" -OutFile $HOME/set-aad.ps1
+./set-aad.ps1
+Remove-Item -Path $HOME/set-aad.ps1
 
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target/set-subscription.ps1" -OutFile $HOME/set-subscription.ps1
 ./set-subscription.ps1
