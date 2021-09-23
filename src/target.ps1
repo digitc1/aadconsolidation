@@ -52,7 +52,6 @@ $roleDefinitions | ForEach-Object -Process {
 $tenantId = (Get-azcontext).Tenant.id
 $TenantName = Get-AzTenant | where{$_.id -eq $tenantId}
 $AzAdApps = Get-Content AADapplications.json | ConvertFrom-Json
-$AzAdRef = Get-content aadappref.json
 $newAppsIds = @{}
 
 ForEach($AzADApp in $AzAdApps){
@@ -63,36 +62,36 @@ ForEach($AzADApp in $AzAdApps){
         $NewApp = New-AzureADApplication -DisplayName $AzAdApp.DisplayName
         $NewSPN = New-AzureADServicePrincipal -AppId $NewApp.AppId
 
-        #Get-ObjectId of old App in json file
+        
         #Add Application owner
-        ForEach($ref in $AzAdRef){
-		if(($ref -notlike "*RunAsAccount*") -And ($ref -notlike "*lzslzAutomation*") -And ($ref -ne "OptionalClaimsApp") -And ($ref -notlike "*aad-extension-app*") -And ($ref -notlike "*Learn On Demand*") -And ($ref -notlike "*Tenant Schema Extension App*") -And ($ref -notlike "*Cost-Monitor-Account*")){
-			$AppName = $Ref.split("`t")[1]
-			$AppName=$AppName.Trim()
-			Write-host $AppName
-			    If($ref.split("`t")[1] -eq $NewApp.DisplayName){
-				$OldOId = $Ref.split("`t")[0]
-				Write-host $OldOId
-				$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
-				$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
-				If(($BackupAppOwner -eq $null) -Or ($BackupAppOwner.userPrincipalName -eq $null)){
-				    Write-Host "Azure Ad app $AppName has no owner assigned."
+        $OldOId=$AzADApp.ObjectId
+	Write-host $OldOId
+	$BackupFile = Get-childitem -Path . | where{$_.name -like "*application*$oldOid*"} 
+	$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
+	If(($BackupAppOwner -eq $null)){
+		Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
+	}Else{
+		ForEach($owner in $BackupAppOwner){
+			 if($owner.userPrincipalName -eq $null){
+				Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
+			 }else{
+				Write-Host "Owner of the application is" $owner.userPrincipalName
+				$ownerObjectId = (Get-AzADUser | Where {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+				if($ownerObjectId -eq $null){
+				   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
 				}Else{
-				    Write-Host "Owner of the application is" $BackupAppOwner.userPrincipalName
-				    $ownerObjectId = (Get-AzADUser | Where {$_.Mail -match $backupAppOwner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
-				    if($ownerObjectId -eq $null){
-					   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
-				    }Else{
+					$currentOwner=Get-AzureADApplicationOwner -objectId $newapp.ObjectId
+					if($currentOwner.ObjectId -ne $ownerObjectId){
 					   Add-AzureADApplicationOwner -ObjectId $newapp.ObjectId -RefObjectId $ownerObjectId 
 					   Write-host "Added $ownerObjectId as owner of the Azure AD app." -ForegroundColor Green 
-				    }
-				}           
-			    }Else{
-				Write-Host "Unable to find the app $AzAdApp in the json file."
-			    }
-	    	}
-        }
-
+					}else{
+						Write-host "Correct owner is already assigned to AzADApp" -ForegroundColor Green 
+					}
+				}
+			  }
+		}
+	}
+	
         #Add ReplyUrls
         $ReplyURLs = $AzADApp.ReplyUrls
 
@@ -178,9 +177,13 @@ ForEach($AzADApp in $AzAdApps){
 
         #Recreate Token Configuration
         $claims = $AzADApp.OptionalClaims
-        If(!(($claims.AccessToken -eq $null) -or ($claims.IdToken -eq $null) -or ($claims.SamlToken -eq $null))){
-            Set-AzureADapplication -ObjectId $newApp.objectid -OptionalClaims $claims
-            Write-host "Recreated Token configuration" -ForegroundColor Green
+        If(!(($claims.AccessToken -eq $null) -and ($claims.IdToken -eq $null) -and ($claims.SamlToken -eq $null))){
+		$tmp = New-Object -TypeName Microsoft.Open.AzureAD.Model.OptionalClaims
+		$tmp.AccessToken = $claims.AccessToken
+		$tmp.IdToken = $claims.IdToken
+		$tmp.SamlToken = $claims.SamlToken
+		Set-AzureADapplication -ObjectId $newApp.objectid -OptionalClaims $tmp
+            	Write-host "Recreated Token configuration" -ForegroundColor Green
         }Else{
             Write-host "No token configuration to be recreated."
         }
@@ -196,14 +199,18 @@ ForEach($AzADApp in $AzAdApps){
         Write-host "Verified Implicit flow status..."
 
         #Public clients
-        $public = $AzADApp.PublicClient
+	If(!($AzAdApp.identifierUris -eq $null)){
+		$public = $AzADApp.PublicClient
 
-        If(($public -eq $null) -or ($public -eq $false)){
-            Set-AzureADApplication -ObjectId $newapp.ObjectId -PublicClient $false
-        }Else{
-            Set-azureadapplication -ObjectId $NewApp.ObjectId -publicclient $true
-        }
-        Write-Host "Public client state has been set."
+		If(($public -eq $null) -or ($public -eq $false)){
+		    Set-AzureADApplication -ObjectId $newapp.ObjectId -PublicClient $false
+		}Else{
+		    Set-azureadapplication -ObjectId $NewApp.ObjectId -publicclient $true
+		}
+		Write-Host "Public client state has been set."
+	} else {
+		Write-Host "Skip public clients because app identifier uris is empty"
+	}
 
         #Implicit ID Token
         #$StateIdToken = az ad app list --app-id $AzADApp.appId | ConvertFrom-Json     
@@ -222,8 +229,12 @@ ForEach($AzADApp in $AzAdApps){
 
         #Exposed API's
         Try{
-            Set-azureadapplication -ObjectId $newapp.objectid -IdentifierUris $AzADApp.IdentifierUris
-            Write-Host "Added the identifier Uri: " $AzAdApp.IdentifierUris -ForegroundColor Green
+            If(!($AzAdApp.identifierUris -eq $null)){
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
+		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
+	    } else {
+			Write-Host "No identifier URI specified" -ForegroundColor Green
+	    }
         }Catch{
             Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
         }
@@ -244,41 +255,48 @@ ForEach($AzADApp in $AzAdApps){
         }
 
         Try{
-            Foreach($Permission in $AzAdApp.Oauth2Permissions){
-                $Id = [Guid]::NewGuid().ToString()
-                $preAuthorizedApp = $AzAdApp
+		$NewPermissions=New-Object Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
+		Foreach($Permission in $AzAdApp.Oauth2Permissions){
+			$Id = [Guid]::NewGuid().ToString()
+			
+			#Create new oAuth2Permission Object
+			$NewPermission = [Microsoft.Open.AzureAD.Model.OAuth2Permission]::new()
+			$NewPermission.AdminConsentDescription = $Permission.AdminConsentDescription
+			$NewPermission.AdminConsentDisplayName = $Permission.AdminConsentDisplayName
+			$NewPermission.Id = $Id
+			$NewPermission.Type = $permission.Type
+			$NewPermission.UserConsentDescription = $Permission.UserConsentDescription
+			$NewPermission.UserConsentDisplayName = $Permission.UserConsentDisplayName
+			$NewPermission.Value = $Permission.value
+			$NewPermissions.add($NewPermission)
+		}
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -Oauth2Permissions $NewPermissions
+		Write-Host "Added API to Azure AD application" -ForegroundColor Green
+	}Catch{
+		Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
+	}
 
-                #Create new oAuth2Permission Object
-                $NewPermission = [Microsoft.Open.AzureAD.Model.OAuth2Permission]::new()
-                $NewPermission.AdminConsentDescription = $Permission.AdminConsentDescription
-                $NewPermission.AdminConsentDisplayName = $Permission.AdminConsentDisplayName
-                $NewPermission.Id = $Id
-                $NewPermission.Type = $permission.Type
-                $NewPermission.UserConsentDescription = $Permission.UserConsentDescription
-                $NewPermission.UserConsentDisplayName = $Permission.UserConsentDisplayName
-                $NewPermission.Value = $Permission.value
-        
-                Set-azureadapplication -ObjectId $NewApp.ObjectId -Oauth2Permissions $NewPermission
-                Write-Host "Added API to Azure AD application" -ForegroundColor Green
-                }
-            }Catch{
-                Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
-            }
-        
-        Start-sleep -seconds 15
+	#Adding logoutUrl
+	if($AzADApp.logoutUrl -ne $null){
+		Set-AzureAdApplication -ObjectId $newApp.ObjectId -logoutUrl $AzADApp.logoutUrl
+		Write-Host "Setting logoutUrl" -ForegroundColor Green
+	}
+
+        Start-sleep -seconds 20
 	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
 		
         Try{
             az ad app permission admin-consent --id $AppId
-            Write-Host "Admin Consent Granted to Azure AD application" -BackgroundColor Green -Foregroundcolor Black
+            Write-Host "Admin Consent Granted to Azure AD application" -Foregroundcolor Black -BackgroundColor Green -NoNewLine
+	    Write-Host " " 
         }catch{
             Write-host "Admin consent failed due to $err"
         }
 
         #Write-Host "Admin Consent Granted to Azure AD application" -BackgroundColor Green -Foregroundcolor Black
-	$newAppsIds.add("$AzADApp.appId",$newApp)
+	$newAppsIds.add($AzADApp.appId,$newApp)
     }
 }
 
@@ -300,11 +318,27 @@ ForEach($AzADApp in $AzAdApps){
 				}else{
 					$newPreAuthAppId = $oldPreAuthAppId
 				}
-				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
+				$newAzureAdAppOAuth2Perm=get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions
+				
+				$newAzureAdAppOAuth2PermIds=""
+				ForEach($perm in $newAzureAdAppOAuth2Perm){
+					ForEach($permissionId in $preAuthApp.DelegatedPermissionIds){
+						$OldAdminConsentDescription=($oldAzAdManifest.api.oauth2permissionScopes | where-object {$_.Id -eq $permissionId}).AdminConsentDescription
+						if($perm.AdminConsentDescription -eq $OldAdminConsentDescription){
+							$id=$perm.Id
+							if($perm  -eq $newAzureAdAppOAuth2Perm[-1]){
+								$newAzureAdAppOAuth2PermIds+="\""$id\"""
+							}else{
+								$newAzureAdAppOAuth2PermIds+="\""$id\"","
+							}
+							
+						}
+					}
+				}
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]}"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [$newAzureAdAppOAuth2PermIds]}"
 				}else{
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]},"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [$newAzureAdAppOAuth2PermIds]},"
 				}
 			}
 			$requestBody+="]}}"
