@@ -277,8 +277,10 @@ ForEach($AzADApp in $AzAdApps){
 		Set-AzureAdApplication -ObjectId $newApp.ObjectId -logoutUrl $AzADApp.logoutUrl
 		Write-Host "Setting logoutUrl" -ForegroundColor Green
 	}
-	
-        #Start-sleep -seconds 20
+
+	$newApp | FL
+        Start-sleep -seconds 20
+	$newApp | FL
 	While(!(Get-AzureADApplication | Where-Object {$_.AppId -eq $newApp.AppId})){
 		Start-Sleep -s 1
 		Write-Host "searching for application ..."
