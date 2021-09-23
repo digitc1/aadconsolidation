@@ -273,8 +273,9 @@ ForEach($AzADApp in $AzAdApps){
 	}
 
 	#Adding logoutUrl
-	if($oldAzAdManifest.web.logoutUrl -ne $null){
-		$newApp.logoutUrl = $oldAzAdManifest.web.logoutUrl
+	if($AzADApp.web.logoutUrl -ne $null){
+		Set-AzureAdApplication -ObjectId $newApp.ObjectId -logoutUrl $AzADApp.web.logoutUrl
+		Write-Host "Setting logoutUrl" -ForegroundColor Green
 	}
 	
         Start-sleep -seconds 20
