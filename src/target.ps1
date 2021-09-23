@@ -326,9 +326,9 @@ ForEach($AzADApp in $AzAdApps){
 					}
 				}
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermIds\""]}"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [$newAzureAdAppOAuth2PermIds]}"
 				}else{
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermIds\""]},"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [$newAzureAdAppOAuth2PermIds]},"
 				}
 			}
 			$requestBody+="]}}"
