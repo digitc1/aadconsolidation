@@ -199,14 +199,18 @@ ForEach($AzADApp in $AzAdApps){
         Write-host "Verified Implicit flow status..."
 
         #Public clients
-        $public = $AzADApp.PublicClient
+	If(!($AzAdApp.identifierUris -eq $null)){
+		$public = $AzADApp.PublicClient
 
-        If(($public -eq $null) -or ($public -eq $false)){
-            Set-AzureADApplication -ObjectId $newapp.ObjectId -PublicClient $false
-        }Else{
-            Set-azureadapplication -ObjectId $NewApp.ObjectId -publicclient $true
-        }
-        Write-Host "Public client state has been set."
+		If(($public -eq $null) -or ($public -eq $false)){
+		    Set-AzureADApplication -ObjectId $newapp.ObjectId -PublicClient $false
+		}Else{
+		    Set-azureadapplication -ObjectId $NewApp.ObjectId -publicclient $true
+		}
+		Write-Host "Public client state has been set."
+	} else {
+		Write-Host "Skip public clients because app identifier uris is empty"
+	}
 
         #Implicit ID Token
         #$StateIdToken = az ad app list --app-id $AzADApp.appId | ConvertFrom-Json     
