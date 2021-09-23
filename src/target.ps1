@@ -251,11 +251,10 @@ ForEach($AzADApp in $AzAdApps){
         }
 
         Try{
-		$NewPermissions=@()
+		$NewPermissions=New-Object Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
 		Foreach($Permission in $AzAdApp.Oauth2Permissions){
 			$Id = [Guid]::NewGuid().ToString()
-			$preAuthorizedApp = $AzAdApp
-
+			
 			#Create new oAuth2Permission Object
 			$NewPermission = [Microsoft.Open.AzureAD.Model.OAuth2Permission]::new()
 			$NewPermission.AdminConsentDescription = $Permission.AdminConsentDescription
@@ -292,7 +291,6 @@ ForEach($AzADApp in $AzAdApps){
 }
 
 ForEach($AzADApp in $AzAdApps){
-	Write-Host "Start"
 	if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
 
 		Write-host "Recreating Azure AD PreAuthorizedApplication oAuth2 permissions"$AzAdApp.DisplayName
