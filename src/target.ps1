@@ -272,6 +272,11 @@ ForEach($AzADApp in $AzAdApps){
 		Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
 	}
 
+	#Adding logoutUrl
+	if($oldAzAdManifest.web.logoutUrl -ne $null){
+		$newApp.logoutUrl = $oldAzAdManifest.web.logoutUrl
+	}
+	
         Start-sleep -seconds 20
 	
         #AZ Cli call test for admin consent
