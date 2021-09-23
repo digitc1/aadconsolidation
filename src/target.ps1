@@ -278,7 +278,7 @@ ForEach($AzADApp in $AzAdApps){
 		Write-Host "Setting logoutUrl" -ForegroundColor Green
 	}
 	
-        #Start-sleep -seconds 20
+        Start-sleep -seconds 20
 	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
