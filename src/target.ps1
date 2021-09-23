@@ -251,26 +251,27 @@ ForEach($AzADApp in $AzAdApps){
         }
 
         Try{
-            Foreach($Permission in $AzAdApp.Oauth2Permissions){
-                $Id = [Guid]::NewGuid().ToString()
-                $preAuthorizedApp = $AzAdApp
+		$NewPermissions=@()
+		Foreach($Permission in $AzAdApp.Oauth2Permissions){
+			$Id = [Guid]::NewGuid().ToString()
+			$preAuthorizedApp = $AzAdApp
 
-                #Create new oAuth2Permission Object
-                $NewPermission = [Microsoft.Open.AzureAD.Model.OAuth2Permission]::new()
-                $NewPermission.AdminConsentDescription = $Permission.AdminConsentDescription
-                $NewPermission.AdminConsentDisplayName = $Permission.AdminConsentDisplayName
-                $NewPermission.Id = $Id
-                $NewPermission.Type = $permission.Type
-                $NewPermission.UserConsentDescription = $Permission.UserConsentDescription
-                $NewPermission.UserConsentDisplayName = $Permission.UserConsentDisplayName
-                $NewPermission.Value = $Permission.value
-        
-                Set-azureadapplication -ObjectId $NewApp.ObjectId -Oauth2Permissions $NewPermission
-                Write-Host "Added API to Azure AD application" -ForegroundColor Green
-                }
-            }Catch{
-                Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
-            }
+			#Create new oAuth2Permission Object
+			$NewPermission = [Microsoft.Open.AzureAD.Model.OAuth2Permission]::new()
+			$NewPermission.AdminConsentDescription = $Permission.AdminConsentDescription
+			$NewPermission.AdminConsentDisplayName = $Permission.AdminConsentDisplayName
+			$NewPermission.Id = $Id
+			$NewPermission.Type = $permission.Type
+			$NewPermission.UserConsentDescription = $Permission.UserConsentDescription
+			$NewPermission.UserConsentDisplayName = $Permission.UserConsentDisplayName
+			$NewPermission.Value = $Permission.value
+			$NewPermissions.add($NewPermission)
+		}
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -Oauth2Permissions $NewPermissions
+		Write-Host "Added API to Azure AD application" -ForegroundColor Green
+	}Catch{
+		Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
+	}
 
         Start-sleep -seconds 20
 	
