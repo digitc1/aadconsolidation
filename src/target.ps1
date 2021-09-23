@@ -272,7 +272,7 @@ ForEach($AzADApp in $AzAdApps){
                 Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
             }
 
-        Start-sleep -seconds 15
+        Start-sleep -seconds 20
 	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
