@@ -278,13 +278,7 @@ ForEach($AzADApp in $AzAdApps){
 		Write-Host "Setting logoutUrl" -ForegroundColor Green
 	}
 
-	$newApp | FL
         Start-sleep -seconds 20
-	$newApp | FL
-	While(!(Get-AzureADApplication | Where-Object {$_.AppId -eq $newApp.AppId})){
-		Start-Sleep -s 1
-		Write-Host "searching for application ..."
-	}
 	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
