@@ -308,11 +308,27 @@ ForEach($AzADApp in $AzAdApps){
 				}else{
 					$newPreAuthAppId = $oldPreAuthAppId
 				}
-				$newAzureAdAppOAuth2PermId = (get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions).Id
+				$newAzureAdAppOAuth2Perm=get-azureadapplication -objectId $newAppsIds.($AzADApp.appId).ObjectId | select -ExpandProperty Oauth2Permissions
+				
+				$newAzureAdAppOAuth2PermIds=""
+				ForEach($perm in $newAzureAdAppOAuth2Perm){
+					ForEach($permissionId in $preAuthApp.DelegatedPermissionIds){
+						$OldAdminConsentDescription=($oldAzAdManifest.api.oauth2permissionScopes | where-object {$_.Id -eq $permissionId}).AdminConsentDescription
+						if($perm.AdminConsentDescription -eq $OldAdminConsentDescription){
+							$id=$perm.Id
+							if($perm  -eq $newAzureAdAppOAuth2Perm[-1]){
+								$newAzureAdAppOAuth2PermIds+="\""$id\"""
+							}else{
+								$newAzureAdAppOAuth2PermIds+="\""$id\"","
+							}
+							
+						}
+					}
+				}
 				if($preAuthApp  -eq $oldAzAdManifest.api.preAuthorizedApplications[-1]){
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]}"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermIds\""]}"
 				}else{
-					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermId\""]},"
+					$requestBody+="{\""appId\"": \""$newPreAuthAppId\"",\""delegatedPermissionIds\"": [\""$newAzureAdAppOAuth2PermIds\""]},"
 				}
 			}
 			$requestBody+="]}}"
