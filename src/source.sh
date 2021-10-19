@@ -99,6 +99,9 @@ for id in $ids ; do az rest --method DELETE --uri "https://management.azure.com/
 
 # Save all information related to PIM
 pim=$(az ad sp create-for-rbac -o tsv)
+
+az ad app update --id $(echo $pim | cut -d' ' -f1) --reply-urls https://localhost:63222
+
 az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 62ade113-f8e0-4bf9-a6ba-5acb31db32fd=Scope
 az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions eb0788c2-6d4e-4658-8c9e-c0fb8053f03d=Scope
 az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions d01b97e9-cbc0-49fe-810a-750afd5527a3=Scope
