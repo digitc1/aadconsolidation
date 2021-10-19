@@ -99,14 +99,14 @@ for id in $ids ; do az rest --method DELETE --uri "https://management.azure.com/
 
 # Save all information related to PIM
 pim=$(az ad sp create-for-rbac -o tsv)
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 62ade113-f8e0-4bf9-a6ba-5acb31db32fd=Scope
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions eb0788c2-6d4e-4658-8c9e-c0fb8053f03d=Scope
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions d01b97e9-cbc0-49fe-810a-750afd5527a3=Scope
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 741c54c3-0c1e-44a1-818b-3f97ab4e8c83=Scope
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 48fec646-b2ba-4019-8681-8eb31435aded=Scope
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8=Role
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 483bed4a-2ad3-4361-a73b-c83ccdbdc53c=Role
-az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions c7fbd983-d9aa-4fa7-84b8-17382c103bc4=Role
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 62ade113-f8e0-4bf9-a6ba-5acb31db32fd=Scope
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions eb0788c2-6d4e-4658-8c9e-c0fb8053f03d=Scope
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions d01b97e9-cbc0-49fe-810a-750afd5527a3=Scope
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 741c54c3-0c1e-44a1-818b-3f97ab4e8c83=Scope
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 48fec646-b2ba-4019-8681-8eb31435aded=Scope
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8=Role
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions 483bed4a-2ad3-4361-a73b-c83ccdbdc53c=Role
+az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions c7fbd983-d9aa-4fa7-84b8-17382c103bc4=Role
 az ad app permission admin-consent --id $(echo $pim | cut -d' ' -f1)
 
 sleep 10
