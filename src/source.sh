@@ -119,8 +119,10 @@ az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000
 az ad app permission add --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000 --api-permissions c7fbd983-d9aa-4fa7-84b8-17382c103bc4=Role
 az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000-0000-c000-000000000000
 
+sleep 10
 az ad app permission admin-consent --id $(echo $pim | cut -d' ' -f1)
 
+sleep 30
 az login --service-principal -u $(echo $pim | cut -d' ' -f1) -p $(echo $pim | cut -d' ' -f4) -t $(echo $pim | cut -d' ' -f5)
 
 az rest --method GET --uri "https://graph.microsoft.com/beta/roleManagement/directory/roleEligibilitySchedules" > pim.json
