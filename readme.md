@@ -29,6 +29,7 @@ In Azure CLI, run the following code:
 ```
 curl https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/source.sh --output script.sh
 chmod +x script.sh
+az login
 ./script.sh [SUBSCRIPTION_NAME}
 rm script.sh
 ```
