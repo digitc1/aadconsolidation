@@ -1,104 +1,105 @@
 # Tenant migration status
 
 ## Consolidated tenant
-- EC(european-commission@hotmail.com)
+- EC
 
 ## Migrated tenants
-- EC_DIGIT_C1_DIGIT1 (acp4eu002@hotmail.com)
-- Chafea(acp4eu044@hotmail.com)
-- EC_DIGIT_S2_prime(acp4eu061@hotmail.com)
+- EC_DIGIT_C1_DIGIT1 
+- Chafea
+- EC_DIGIT_S2_prime
 
 ## Tenants in analysis
-- EC_JRC_CRITECH(acp4eu071@hotmail.com)
-- EC_ESTAT_PLAYGROUND(acp4eu017@hotmail.com)
-- EC_ESTAT_GISCO(acp4eu021@hotmail.com)
+- EC_JRC_CRITECH
+- EC_ESTAT_PLAYGROUND
+- EC_ESTAT_GISCO
 
 ## Tenants to migrate
-- EC_DIGIT_B3_SEP (acp4eu006@hotmail.com)
-- EC_EASME (acp4eu007@hotmail.com)
-- EC_DIGIT_B1_ARCHITECTURE (acp4eu009@hotmail.com)EC_EASA(acp4eu011@hotmail.com)
-- EC_DIGIT_B1_FOSSA(acp4eu012@hotmail.com)
-- EC_ECFIN_R3_PLAYGROUND(acp4eu014@hotmail.com)
-- EC_DIGIT_C3_PLAYGROUND(acp4eu015@hotmail.com)
-- EC_DIGIT_C2_SRV4DEV(acp4eu018@hotmail.com)
-- JUST_SRD03_PRIAMOS(acp4eu020@hotmail.com)
-- EC_DIGIT_B6_ISA_IT(acp4eu022@hotmail.com)
-- EC_DIGIT_B1_SEARCH(acp4eu023@hotmail.com)
-- EC_OP_A4(acp4eu024@hotmail.com)
-- EC_EMPL(acp4eu025@hotmail.com)
-- EC_DIGIT_A3_Next Europa Non Production(acp4eu026@hotmail.com)
-- EC_AGRI_QlikView For Markets(acp4eu027@hotmail.com)
-- EC_DIGIT_B4_PRIME(acp4eu028@hotmail.com)
-- EC_DGT_MTatEC(acp4eu029@hotmail.com)
-- EC_Digit_B4_E-Invoice(acp4eu030@hotmail.com)
-- EC_COMM_A4_AVS(acp4eu031@hotmail.com)
-- EC_JRC_E3(acp4eu032@hotmail.com)
-- EC_CNECT(acp4eu033@hotmail.com)
-- EC_ESMA(acp4eu034@hotmail.com)
-- EC_TRADE_PRIME(acp4eu036@hotmail.com)
-- EC_DIGIT_B4_WIFI4EU(acp4eu037@hotmail.com / admin@acp4eu037hotmail.onmicrosoft.com)
-- EC_EASO(acp4eu040@hotmail.com)
-- EC_EASO_MALTA(acp4eu041@hotmail.com)
-- EC_SG_REFIT(acp4eu042@hotmail.com)
-- EC_MOVE-ENER_MOVEHUB(acp4eu045@hotmail.com)
-- EASO(acp4eu054@hotmail.com)
-- EC_DIGIT/TAXUD_CLASS(acp4eu055@hotmail.com)
-- DIGIT_B4_blockchain(acp4eu056@hotmail.com)
-- EC_DIGIT_D2_SEMIC(acp4eu057@hotmail.com)
-- EC_DIGIT_D2_SEMIC 2(acp4eu058@hotmail.com)
-- EC_DIGITEC_HR_DS_PLAYGROUND(acp4eu059@hotmail.com)
-- EMPL-EURES(acp4eu060@hotmail.com)
-- EC_DIGIT_B4_SEP Evaluation(acp4eu063@hotmail.com)
-- EC_DIGIT_D1_SANDBOX(acp4eu064@hotmail.com / admin@acp4eu064hotmail.onmicrosoft.com)
-- EC_MOVE-ENER_TRIMODE(acp4eu066@hotmail.com)
-- DIGIT_C1_DEV_LZ(acp4eu067@hotmail.com)
-- EC_OP_LINKED_OPEN_DATA(acp4eu069@hotmail.com)
-- EC_OLAF_AFIS(acp4eu070@hotmail.com)
+- EC_DIGIT_B3_SEP 
+- EC_EASME 
+- EC_DIGIT_B1_ARCHITECTURE 
+- EC_DIGIT_B1_FOSSA
+- EC_ECFIN_R3_PLAYGROUND
+- EC_DIGIT_C3_PLAYGROUND
+- EC_DIGIT_C2_SRV4DEV
+- JUST_SRD03_PRIAMOS
+- EC_DIGIT_B6_ISA_IT
+- EC_DIGIT_B1_SEARCH
+- EC_OP_A4
+- EC_EMPL
+- EC_DIGIT_A3_Next Europa Non Production
+- EC_AGRI_QlikView For Markets
+- EC_DIGIT_B4_PRIME
+- EC_DGT_MTatEC
+- EC_Digit_B4_E-Invoice
+- EC_COMM_A4_AVS
+- EC_JRC_E3
+- EC_CNECT
+- EC_ESMA
+- EC_TRADE_PRIME
+- EC_DIGIT_B4_WIFI4EU
+- EC_EASO
+- EC_EASO_MALTA
+- EC_SG_REFIT
+- EC_MOVE-ENER_MOVEHUB
+- EASO
+- EC_DIGIT/TAXUD_CLASS
+- DIGIT_B4_blockchain
+- EC_DIGIT_D2_SEMIC
+- EC_DIGIT_D2_SEMIC 2
+- EC_DIGITEC_HR_DS_PLAYGROUND
+- EMPL-EURES
+- EC_DIGIT_B4_SEP Evaluation
+- EC_DIGIT_D1_SANDBOX
+- EC_MOVE-ENER_TRIMODE
+- DIGIT_C1_DEV_LZ
+- EC_OP_LINKED_OPEN_DATA
+- EC_OLAF_AFIS
 - EC_DIGIT_D1_DataPlatform(acp4eu072@hotmail.com
-- EC_MARE_Data(acp4eu073@hotmail.com)
-- EC_DIGIT_A-TF(acp4eu077@hotmail.com)
-- EC_DIGIT_BROKER_SECURITY(acp4eu078@hotmail.com)
-- EC_DIGIT_D3_ebsi(acp4eu080@hotmail.com)
-- EC_DIGIT_D1_EM-DELOTTE(acp4eu082@hotmail.com)
-- EC_DIGIT_D1_EM-UNIV(acp4eu083@hotmail.com)
-- EACEA_Roadmaps(acp4eu084@hotmail.com)
-- EC_OP(acp4eu085@hotmail.com)
-- EC_JRC(acp4eu086@hotmail.com)
-- EC_DIGIT_WIFI4EU_SSO(acp4eu52@hotmail.com)
-- EC_DGT_E-Translation(acp4eu053@hotmail.com)
-- EC_Digit_A3(acpcloud622@hotmail.com)
-- EC_DGT client(acpcloud623@hotmail.com)
-- EC_DIGIT_B1(acpcloud624@hotmail.com)
-- EC_DIGIT_B4(acpcloud645@hotmail.com)
-- EC_AGRI(acpcloud648@hotmail.com)
-- EC_NEAR(acpcloud657@hotmail.com)
-- Dragos-Stefan Marin(adm_dmarin@esma.europa.eu)
-- esmatest(adm_tonino.bruno@esmatest.onmicrosoft.com)
+- EC_MARE_Data
+- EC_DIGIT_A-TF
+- EC_DIGIT_BROKER_SECURITY
+- EC_DIGIT_D3_ebsi
+- EC_DIGIT_D1_EM-DELOTTE
+- EC_DIGIT_D1_EM-UNIV
+- EACEA_Roadmaps
+- EC_OP
+- EC_JRC
+- EC_DIGIT_WIFI4EU_SSO
+- EC_DGT_E-Translation
+- EC_Digit_A3
+- EC_DGT client
+- EC_DIGIT_B1
+- EC_DIGIT_B4
+- EC_AGRI
+- EC_NEAR
+- Dragos-Stefan Marin
+- esmatest
 - Alexandre Chanderot(alexandre.chanderot@esma.europa.eu
-- AccentureInternalTesting(azaccrecov@hotmail.com)
-- COR_PRIME(azure_subscription@eesccor.onmicrosoft.com)
-- AzureEverywhereSessions(cloud4eu@hotmail.com)
-- EC_EPPO(Cloud@eppo.europa.eu)
-- EC_DEV_TEST(dev-test@europeancommissionhotmai379.onmicrosoft.com)
-- EC_ECHO(digit-broker@echofield.onmicrosoft.com)
-- F4E(digit-broker@f4e.europa.eu)
-- CDT(digit.broker@itcdteuropaeu.onmicrosoft.com)
-- ETF(DigitAzure@etf.europa.eu)
-- EASO_AZURE(EASO.Azure@easo.europa.eu)
-- EC_DIGIT_C6_CMG_ACCEPTANCE(EC-M365AzureId-CVTF-1903@POCOP.onmicrosoft.com)
-- EC_DIGIT_M365_DEV-TEST(ec-m365azureid-devtest@eceuropaeu.onmicrosoft.com)
+- AccentureInternalTesting
+- COR_PRIME
+- AzureEverywhereSessions
+- EC_EPPO
+- EC_DEV_TEST
+- EC_ECHO
+- F4E
+- CDT
+- ETF
+- EASO_AZURE
+- EC_DIGIT_C6_CMG_ACCEPTANCE
+- EC_DIGIT_M365_DEV-TEST
 - EC_DIGIT_M365ec-m365azureid@eceuropaeu.onmicrosoft.com)
-- Team 1(estathackathon01@hotmail.com)
-- Team 15(estathackaton15@hotmail.com)
-- EC_DIGIT_A-TF(european.commission@hotmail.com)
-- LAB-AAD( ga_basista_876a5d50-cad2-4193-9ef4-16ae7f4ddd4e@lab.cloud.ecb.int )
-- PROD-AAD( ga_basista_97895119-ba21-4b3c-be18-5052c041b41a@cloud.ecb.int )
-- TEST-AAD( ga_basista_e9b2a003-e76f-4c00-839f-df08d2ae0618@test.cloud.ecb.int )
-- inernalTest( internal.test.accenture@hotmail.com )
-- Test( jml.lebrun@gmail.com )
-- Milena Gomez( milena.gomez@esma.europa.eu )
-- nicolaesilvestrubirlea( nicolae.silvestrubirlea@esma.europa.eu )
-- EC_PRODUCTION_1( production1@europeancommissionhotmai379.onmicrosoft.com )
-- securitiesandmarketsauth( systems.admin@esma.europa.eu )
-- CORP-SecurityAndMarketsAuth( systems.admin@esma.europa.eu )
-- DIGIT_MAIN( trialusereu001@hotmail.com )
+- Team 1
+- Team 15
+- EC_DIGIT_A-TF
+- LAB-AAD
+- PROD-AAD
+- TEST-AAD
+- inernalTest
+- Test
+- Milena Gomez
+- nicolaesilvestrubirlea
+- EC_PRODUCTION_1
+- securitiesandmarketsauth
+- CORP-SecurityAndMarketsAuth
+- DIGIT_MAIN
+- 
