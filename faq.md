@@ -59,8 +59,8 @@ Yes. During the entire migration process, the developers will not be able to log
 ### Will all users be migrated?
 
 There are 3 possibilities that can arise:
-1. The user has a @ec.europa.eu or @ext.ec.europa.eu account . In this case, the user will be migrated.
-1. The user connects with a local user account (@acp4euXXXhotmail.onmicrosoft.com). In this case, the user will be migrated if a corresponding @ec.europa.eu user can be found in the destination tenant. Otherwise, the user will not be migrated automatically and some additional manual steps will be required to complete the transition.
+1. The user has a @ec.europa.eu or @ext.ec.europa.eu account . In this case, the user will be automatically invited in the new consolidated tenant as part of the script and the same access rights will be applied. 
+1. The user connects with a local user account (@acp4euXXXhotmail.onmicrosoft.com). In this case, the user will be migrated if a corresponding @ec.europa.eu user can be found in the destination tenant (e.g. The user account john.doe@acp4eu001hotmail.onmicrosoft.com will automatically be mapped to user john.doe@(ext.)ec.europa.eu if this user already exist in the consolidated tenant). Otherwise, the user will not be migrated automatically and some additional manual steps will be required to complete the transition.
 1. The user connects with an external provider account (@company.com other than europa.eu). In this case, the user will not be migrated automatically and some additional manual steps will be required to complete the transition.
 
 ### Will all groups be migrated?
