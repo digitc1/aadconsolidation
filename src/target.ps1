@@ -48,6 +48,21 @@ $roleDefinitions | ForEach-Object -Process {
     }
 }
 
+#Check users if the old tenant and try to reinvite in the new tenant if they were invited from EC
+$userList = Get-Content userList.json | ConvertFrom-Json
+ForEach($user in $userList){
+    if($user.mail -Like ("*@*ec.europa.eu")){
+        Write-Host "Checking user $($user.mail)"
+        if(Get-AzADUser -Mail $user.mail){
+            Write-Host "User already added in the consolidated tenant"
+        } else {
+            New-AzureADMSInvitation -InvitedUserEmailAddress $user.mail -SendInvitationMessage $True -InviteRedirectUrl "http://myapps.microsoft.com"
+        }
+    } else {
+        Write-Host "user email not supported"
+    }
+}
+
 #Recreate Azure AD applications
 $tenantId = (Get-azcontext).Tenant.id
 $TenantName = Get-AzTenant | where{$_.id -eq $tenantId}
