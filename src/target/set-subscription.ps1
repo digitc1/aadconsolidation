@@ -121,7 +121,7 @@ $roleAssignments | ForEach-Object -Process {
 		    }
 		    "ServicePrincipal" { 
                 $mapping = Get-Content -Path ../mappingTable.json | ConvertFrom-Json
-                $appId = $mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName}
+                $appId = ($mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName}).newAppId
                 $ServicePrincipal = Get-AzADServicePrincipal -ApplicationId $appId
                 $objectId = $ServicePrincipal.Id
 		    }
