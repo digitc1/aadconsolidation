@@ -1,93 +1,80 @@
 $vaultName = ""
 
-Write-Host "Creating new vault for automation accounts certificates"
-$rand = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 20| foreach-object {[char]$_})
-$vaultName = "kv" + $rand
-$resourceGroup = New-AzResourceGroup -Name "autocreate_rg" -Location "westeurope" -Tag @{state="DONOTDELETE"}
-New-AzKeyVault -VaultName $vaultName -ResourceGroupName "autocreate_rg" -location "westeurope" -Sku 'Standard'
-Write-Host "Created vault "$vaultName
+if(!(Get-AzResourceGroup | Where-Object {$_.ResourceGroupName -eq "autocreate_rg"})){
+	New-AzResourceGroup -Name "autocreate_rg" -Location "westeurope" -Tag @{state="DONOTDELETE"}
+}
+if(!($vault = Get-AzKeyVault | Where-Object {$_.ResourceGroupName -eq "autocreate_rg"})){
+	$rand = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 20| foreach-object {[char]$_})
+	$vaultName = "kv" + $rand
+	$vault = New-AzKeyVault -VaultName $vaultName -ResourceGroupName "autocreate_rg" -location "westeurope" -Sku 'Standard'
+}
+$vaultName = $vault.VaultName
 
 Write-Host "Assigning access policy to current user"
 $currentUserId = az ad signed-in-user show --query objectId -o tsv
 Set-AzKeyVaultAccessPolicy -VaultName $vaultName -ObjectId $currentUserId -PermissionsToKeys Get,List,Update,Create,Import,Delete,Recover,Backup,Restore -PermissionsToCertificates Get, List, Update, Create, Import, Delete, Recover, Backup, Restore, ManageContacts,ManageIssuers, GetIssuers, ListIssuers, SetIssuers, DeleteIssuers -PermissionsToSecrets Get,List,Set,Delete,Recover,Backup,Restore -Passthru
 Start-Sleep -seconds 10
-#$vaultName
 
 #To run for each automation account
 Write-Host "Recreate service principal and runAs account for Azure automation"
-if(Test-Path ./automationAccounts.json) {
-	$content = Get-Content automationAccounts.json | ConvertFrom-Json
-	$content | ForEach-Object -Process {
-	    Write-Host "Configuring automation account "$_.name
-	    $automationAccountName = $_.name
-	    $automationAccountResourceGroup = $_.resourceGroup
-	    $automationAccount = Get-AzAutomationAccount | Where-Object {$_.automationAccountName -eq $automationAccountName}
-	    $RunAsAccount = "RunAsAccount-$($automationAccount.SubscriptionId)-$($automationAccount.AutomationAccountName)"
+$automationAccounts = Get-AzAutomationAccount
+ForEach ($automationAccount in $automationAccounts) {
+        Write-Host "Configuring automation account $($automationAccount.automationAccountName)"
+        $automationApplication = Get-AzADApplication | Where-Object {$_.DisplayName -Like "$($automationAccount.AutomationAccountName)_*"}
 
-	    Write-Host "RunAsAccount is $RunAsAccount"
-	    Write-Host "Creating certificate"
-	    $AzureKeyVaultCertificatePolicy = New-AzKeyVaultCertificatePolicy -SubjectName $CertificateSubjectName -IssuerName "Self" -KeyType "RSA" -KeyUsage "DigitalSignature" -ValidityInMonths 12 -RenewAtNumberOfDaysBeforeExpiry 20 -KeyNotExportable:$False -ReuseKeyOnRenewal:$False
-	    $AzureKeyVaultCertificate = Add-AzKeyVaultCertificate -VaultName $vaultName -Name $RunAsAccount -CertificatePolicy $AzureKeyVaultCertificatePolicy
+        if($automationApplication){
+                Write-Host "Configuring the 'run as account' for automation account '$($automationAccount.AutomationAccountName)'"
+                Write-Host "Creating certificate"
+                $CertificateSubjectName = "CN=EU,OU=EU,O=org,L=Brussels,S=Belgium,C=BE"
+                $AzureKeyVaultCertificatePolicy = New-AzKeyVaultCertificatePolicy -SubjectName $CertificateSubjectName -IssuerName "Self" -KeyType "RSA" -KeyUsage "DigitalSignature" -ValidityInMonths 12 -RenewAtNumberOfDaysBeforeExpiry 20 -KeyNotExportable:$False -ReuseKeyOnRenewal:$False
+                $AzureKeyVaultCertificate = Add-AzKeyVaultCertificate -VaultName $vaultName -Name $automationAccount.AutomationAccountName -CertificatePolicy $AzureKeyVaultCertificatePolicy
 
-	    do {
-	    start-sleep -Seconds 20
-	    } until ((Get-AzKeyVaultCertificateOperation -Name $RunAsAccount -vaultName $vaultName).Status -eq "completed")
+                do {
+                        Write-Host "Waiting for long-running task to complete ..."
+                        start-sleep -Seconds 5
+                } until ((Get-AzKeyVaultCertificateOperation -Name $automationAccount.AutomationAccountName -vaultName $vaultName).Status -eq "completed")
 
-	    Write-Host "Exporting certificate"
-	    $PfxPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 48| foreach-object {[char]$_})
-	    $secretPassword = ConvertTo-SecureString -String $PfxPassword -Force -AsPlainText
-	    Set-AzKeyvaultSecret -VaultName $vaultName -Name "$RunAsAccount-secret" -SecretValue $secretPassword
-	    $PfxFilePath = join-path -Path (get-location).path -ChildPath "cert.pfx"
-	    $AzKeyVaultCertificatObject = Get-AzKeyVaultCertificate -VaultName $vaultName -Name $RunAsAccount
-	    $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $AzKeyVaultCertificatObject.Name
-	    $secretValueText = '';
-	    $ssPtr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secret.SecretValue)
-	    try {
-		    $secretValueText = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ssPtr)
-	    } finally {
-		    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ssPtr)
-	    }
+                Write-Host "Exporting certificate"
+                $PfxPassword = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 48| foreach-object {[char]$_})
+                $secretPassword = ConvertTo-SecureString -String $PfxPassword -Force -AsPlainText
+                Set-AzKeyvaultSecret -VaultName $vaultName -Name "$($automationAccount.AutomationAccountName)-secret" -SecretValue $secretPassword | Out-Null
+                $PfxFilePath = join-path -Path (get-location).path -ChildPath "cert.pfx"
+                $AzKeyVaultCertificatObject = Get-AzKeyVaultCertificate -VaultName $vaultName -Name $($automationAccount.AutomationAccountName)
+                $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $AzKeyVaultCertificatObject.Name
+                $secretValueText = '';
+                $ssPtr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secret.SecretValue)
+                try {
+                        $secretValueText = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ssPtr)
+                } finally {
+                        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ssPtr)
+                }
 
-	    $AzKeyVaultCertificatSecretBytes = [System.Convert]::FromBase64String($SecretValueText)
-	    $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-	    $certCollection.Import($AzKeyVaultCertificatSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
-	    $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $PfxPassword)
-	    [System.IO.File]::WriteAllBytes($PfxFilePath, $protectedCertificateBytes)
+                $AzKeyVaultCertificatSecretBytes = [System.Convert]::FromBase64String($SecretValueText)
+                $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+                $certCollection.Import($AzKeyVaultCertificatSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
+                $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $PfxPassword)
+                [System.IO.File]::WriteAllBytes($PfxFilePath, $protectedCertificateBytes)
 
-	    Write-Host "creating Azure AD application"
-	    # Redirect URI must be unique in the tenant
-	    # What to do if multiple customers defined http://localhost
-	    # DisplayName must be taken from migration file
-	    if(!($AzADApplicationRegistration = Get-AzADApplication | Where-Object {$_.DisplayName -eq $RunAsAccount -And $_.identifierUris -eq "https://$RunAsAccount"})){
-		$AzADApplicationRegistration = New-AzADApplication -DisplayName $RunAsAccount -HomePage "http://$RunAsAccount" -IdentifierUris "https://$RunAsAccount"
-	    } else {
-		$rand = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 5| foreach-object {[char]$_})
-		$RunAsAccount = $RunAsAccount + $rand
-		$AzADApplicationRegistration = New-AzADApplication -DisplayName "$RunAsAccount" -HomePage "http://$RunAsAccount" -IdentifierUris "https://$RunAsAccount"
-	    }
+                Write-Host "Link Azure AD application and automation account with certificate"
+                $AzKeyVaultCertificatStringValue = [System.Convert]::ToBase64String($certCollection.GetRawCertData())
+                #New-AzADAppCredential -ApplicationId $automationApplication.ApplicationId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter
+                #$automationAppCredential = Get-AzADAppCredential -ApplicationId $automationApplication.ApplicationId
+                $automationAppCredential = New-AzADAppCredential -ApplicationId $automationApplication.ApplicationId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter -CustomKeyIdentifier "RunAsAccount"
+                #$AzADServicePrincipal = New-AzADServicePrincipal -ApplicationId $automationApplication.ApplicationId -SkipAssignment
+                $automationADServicePrincipal = Get-AzADServicePrincipal -ApplicationId $automationApplication.ApplicationId
+                Set-AzAutomationCertificate -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Path $PfxFilePath -Name $automationAccount.AutomationAccountName -Password $secretPassword -Exportable:$Exportable
 
-	    Write-Host "Link Azure AD application and automation account with certificate"
-	    $AzKeyVaultCertificatStringValue = [System.Convert]::ToBase64String($certCollection.GetRawCertData())
-	    New-AzADAppCredential -ApplicationId $AzADApplicationRegistration.ApplicationId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter
-	    $AzADServicePrincipal = New-AzADServicePrincipal -ApplicationId $AzADApplicationRegistration.ApplicationId -SkipAssignment
-	    # TODO: Get $automationAccount from the file
-	    New-AzAutomationCertificate -ResourceGroupName $automationAccountResourceGroup -AutomationAccountName $automationAccountName -Path $PfxFilePath -Name $RunAsAccount -Password $secretPassword -Exportable:$Exportable
+                $ConnectionFieldData = @{
+                        "ApplicationId" = $automationApplication.ApplicationId
+                        "TenantId" = (Get-AzContext).Tenant.ID
+                        "CertificateThumbprint" = $certCollection.Thumbprint
+                        "SubscriptionId" = (Get-AzContext).Subscription.ID
+                }
 
-	    $ConnectionFieldData = @{
-	    "ApplicationId" = $AzADApplicationRegistration.ApplicationId
-	    "TenantId" = (Get-AzContext).Tenant.ID
-	    "CertificateThumbprint" = $certCollection.Thumbprint
-	    "SubscriptionId" = (Get-AzContext).Subscription.ID
-	    }
-
-	    $AzAutomationConnection = New-AzAutomationConnection -ResourceGroupName $automationAccountResourceGroup -AutomationAccountName $automationAccountName -Name $RunAsAccount -ConnectionTypeName "AzureServicePrincipal" -ConnectionFieldValues $ConnectionFieldData
-	    Start-Sleep -seconds 15
-	    $servicePrincipal = Get-AzADServicePrincipal | where-Object {$_.DisplayName -eq $RunAsAccount}
-
-	    #TODO remove assignment
-	    Write-Host "Assigning default contributor right to automation account's service principal"
-	    New-AzRoleAssignment -objectId $servicePrincipal.Id -RoleDefinitionName "Contributor"
-	}
+                New-AzAutomationConnection -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Name "AzureRunAsConnection" -ConnectionTypeName "AzureServicePrincipal" -ConnectionFieldValues $ConnectionFieldData
+        } else {
+                Write-Host "No 'Run as account' linked to the automation account '$($automationAccount.AutomationAccountName)'. Skipping creation of the run as account"
+        }
 }
 
 # Recreate role assignments
@@ -102,11 +89,11 @@ $roleAssignments | ForEach-Object -Process {
         $objectId = ""
 	    switch($_.principalType){
 		    "User" {
-			    $objectId = (Get-AzADUser | Where {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+			    $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 		    }
 		    "Group" {
-                if(!($group = Get-AzADGroup -DisplayName $principalName)){
-                    $group = New-AzADGroup -DisplayName $principalName
+                if(!(Get-AzADGroup -DisplayName $principalName)){
+                    New-AzADGroup -DisplayName $principalName | Out-Null
                 }
                 $objectId = (Get-AzADGroup -DisplayName $principalName).Id
 		    }
@@ -157,7 +144,7 @@ Get-ChildItem -Filter kv-*.json | ForEach-Object {
         $user = $userList | Where-Object {$_.objectId -eq $objectId}
         if($user) {
             Write-Host "Recreating access policy for user $($user.userPrincipalName)"
-            $newUserId = (Get-AzADUser | Where {$_.Mail -match $user.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+            $newUserId = (Get-AzADUser | Where-Object {$_.Mail -match $user.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
             $newUserId
             if($newUserId){
                 Set-AzKeyVaultAccessPolicy -ObjectId $newUserId -VaultName $vaultName -PermissionsToKeys $permissions.keys -PermissionsToSecrets $permissions.secrets -PermissionsToCertificates $permissions.certificates -PassThru
@@ -177,7 +164,7 @@ $sql | ForEach-Object -Process {
 	Write-Host "reconfigure server" $_.id.split('/')[8]
 	$login = $_.login
     try {
-	    $objectId = (Get-AzADUser | Where {$_.Mail -match $login.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+	    $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $login.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 	    if($objectId){
             Write-Host "Assigning sql server admin to $objectId"
             Set-AzSqlServerActiveDirectoryAdministrator -objectId $objectId -ResourceGroupName $_.resourceGroup -ServerName ($_.id.split('/')[8]) -DisplayName "DBAs"
