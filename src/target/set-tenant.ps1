@@ -2,26 +2,6 @@
 
 $DNSSuffix = "ec.europa.eu"
 
-# Recreate custom roles if any
-Write-Host "checking custom roles" -ForegroundColor yellow
-$roleDefinitions = Get-Content customroles.json | ConvertFrom-Json
-$roleDefinitions | ForEach-Object -Process {
-	Write-Host "checking role definition "$_.roleName
-	$definition = New-Object Microsoft.Azure.Commands.Resources.Models.Authorization.PSRoleDefinition
-	$definition.AssignableScopes = $_.assignableScopes
-	$definition.Actions = $_.permissions.actions
-	$definition.NotActions = $_.permissions.notActions
-	$definition.DataActions = $_.permissions.dataActions
-	$definition.NotDataActions = $_.permissions.notDataActions
-	$definition.Name = $_.roleName
-	$definition.Description = $_.description
-    if(!(Get-AzRoleDefinition | Where-Object {$_.Name -eq $definition.Name})){
-	    New-AzRoleDefinition -Role $definition
-    } else {
-        Write-Host "Custom role already exist" $definition.Name
-    }
-}
-
 #Check users if the old tenant and try to reinvite in the new tenant if they were invited from EC
 $userList = Get-Content userList.json | ConvertFrom-Json
 ForEach($user in $userList){
@@ -49,8 +29,20 @@ ForEach($AzADApp in $AzAdApps){
         #Recreating Azure AD apps based from backed up Json file
         $NewApp = New-AzureADApplication -DisplayName $AzAdApp.DisplayName
         $NewSPN = New-AzureADServicePrincipal -AppId $NewApp.AppId
-
         
+        $mapping = New-Object -TypeName psobject
+        if(Get-ChildItem mappingOldAppNewSP.json){
+            $mapping = Get-Content -Path mappingOldAppNewSP.json | ConvertFrom-Json
+        }
+        $properties = @{
+            oldAppId = $AzAdApp.appId
+            newServicePrincipal = $NewSPN.Id
+        }
+
+        $mapping += $properties
+
+        $mapping | ConvertTo-Json -Depth 5 > mappingOldAppNewSP.json
+
         #Add Application owner
         $OldOId=$AzADApp.ObjectId
 	Write-host $OldOId

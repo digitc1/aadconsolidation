@@ -2,6 +2,26 @@ $vaultName = ""
 $subscriptionId = (Get-AzContext).Subscription.Id
 Set-Location -Path $subscriptionId
 
+# Recreate custom roles if any
+Write-Host "checking custom roles" -ForegroundColor yellow
+$roleDefinitions = Get-Content customroles.json | ConvertFrom-Json
+$roleDefinitions | ForEach-Object -Process {
+	Write-Host "checking role definition "$_.roleName
+	$definition = New-Object Microsoft.Azure.Commands.Resources.Models.Authorization.PSRoleDefinition
+	$definition.AssignableScopes = $_.assignableScopes
+	$definition.Actions = $_.permissions.actions
+	$definition.NotActions = $_.permissions.notActions
+	$definition.DataActions = $_.permissions.dataActions
+	$definition.NotDataActions = $_.permissions.notDataActions
+	$definition.Name = $_.roleName
+	$definition.Description = $_.description
+    if(!(Get-AzRoleDefinition | Where-Object {$_.Name -eq $definition.Name})){
+	    New-AzRoleDefinition -Role $definition
+    } else {
+        Write-Host "Custom role already exist" $definition.Name
+    }
+}
+
 if(!(Get-AzResourceGroup | Where-Object {$_.ResourceGroupName -eq "autocreate_rg"})){
 	New-AzResourceGroup -Name "autocreate_rg" -Location "westeurope" -Tag @{state="DONOTDELETE"}
 }
@@ -99,8 +119,9 @@ $roleAssignments | ForEach-Object -Process {
                 }
                 $objectId = (Get-AzADGroup -DisplayName $principalName).Id
 		    }
-		    "ServicePrincipal" {
-			    #New-AzRoleAssignment -ObjectId $_.PrincipalId -RoleDefinitionName $roleDefinition -Scope $scope	
+		    "ServicePrincipal" { 
+                $mapping = Get-Content -Path ../mappingOldAppNewSP.json | ConvertFrom-Json
+                $objectId = ($mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName})[0].newServicePrincipal
 		    }
 		    default {
 			    Write-Host "Role assignment cannot be assigned, unknown principal type: $_.principalType"
