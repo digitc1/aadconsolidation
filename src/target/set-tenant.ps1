@@ -21,6 +21,7 @@ ForEach($user in $userList){
 $tenantId = (Get-azcontext).Tenant.id
 $AzAdApps = Get-Content AADapplications.json | ConvertFrom-Json
 $newAppsIds = @{}
+$mappingTable = @()
 
 ForEach($AzADApp in $AzAdApps){
     if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
@@ -31,17 +32,10 @@ ForEach($AzADApp in $AzAdApps){
         $NewSPN = New-AzureADServicePrincipal -AppId $NewApp.AppId
         
         $mapping = New-Object -TypeName psobject
-        if(Get-ChildItem mappingOldAppNewSP.json){
-            $mapping = Get-Content -Path mappingOldAppNewSP.json | ConvertFrom-Json
-        }
-        $properties = @{
-            oldAppId = $AzAdApp.appId
-            newServicePrincipal = $NewSPN.Id
-        }
+        $mapping | Add-Member -MemberType NoteProperty -Name "oldAppId" -Value $AzAdApp.appId
+        $mapping | Add-Member -MemberType NoteProperty -Name "newServiceprincipal" -Value $NewSPN.Id
 
-        $mapping += $properties
-
-        $mapping | ConvertTo-Json -Depth 5 > mappingOldAppNewSP.json
+        $mappingTable += $mapping
 
         #Add Application owner
         $OldOId=$AzADApp.ObjectId
@@ -279,6 +273,8 @@ ForEach($AzADApp in $AzAdApps){
 	$newAppsIds.add($AzADApp.appId,$newApp)
     }
 }
+
+$mappingTable | ConvertTo-Json > mappingTable.json
 
 ForEach($AzADApp in $AzAdApps){
 	if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
