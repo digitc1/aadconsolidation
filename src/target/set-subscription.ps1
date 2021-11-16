@@ -138,9 +138,6 @@ $roleAssignments | ForEach-Object -Process {
         elseif ( $roleDefinition -eq 'User Access Administrator' ) {
             Write-Host "Role User Access Administrator cannot be assigned"
         }
-        elseif ( $_.principalType -eq 'ServicePrincipal' ) {
-            Write-Host "service principal is not supported yet"
-        }
         else {
             New-AzRoleAssignment -ObjectId $objectId -RoleDefinitionName $roleDefinition -Scope $scope
             Write-Host "role $($_.RoleDefinitionName) assigned to $($_.principalType) $($_.principalName)"
