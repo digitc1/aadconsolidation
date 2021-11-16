@@ -2,10 +2,12 @@
 #!/bin/bash
 
 # Switch to the correct subscription
-if az account set --subscription "$1" ; then
-	echo "Subscription successfully loaded"
+if [ "$1" ]; then
+	list=$1 ;
+	echo "Subscription successfully loaded:" $test
 else
-	echo "Error using subscriptionId, halting execution" && exit 1
+	list=$(az account list --query [].id --output tsv)
+	echo "Loading all subscriptions"
 fi
 
 mkdir aadmigration
@@ -77,19 +79,25 @@ az ad sp list --all --filter "servicePrincipalType eq 'Application'" > applicati
 # List user assigned managed identities only
 az identity list > useridentity.json
 
-# Save all keyvaults configuration to json files to reproduce access to key and secret in the new directory
-keyvaults=$(az keyvault list --query [].name --output tsv)
-for i in $keyvaults;
+for j in $list
 do
-        az keyvault show --name $i > "kv-$i.json"
+	# Set Azure Subscription
+	az account set --subscription $j
+
+	# Save all keyvaults configuration to json files to reproduce access to key and secret in the new directory
+	keyvaults=$(az keyvault list --query [].name --output tsv)
+	for i in $keyvaults;
+	do
+        az keyvault show --name $i > "kv-$i-$j.json"
+	done
+
+	# List Azure SQL databases with AAD authentication to reproduce in the new directory
+	az sql server ad-admin list --ids $(az graph query -q "resources | where type == 'microsoft.sql/servers' | project id" -o tsv |  cut -f1) > sql-$j.json
+
+	# List other resources with known Azure AD dependencies
+	subscription=$(az account show --query id | sed -e 's/^"//' -e 's/"$//')
+	az graph query -q "resources | where type != 'microsoft.azureactivedirectory/b2cdirectories' | where identity <> '' or properties.tenantId <> '' or properties.encryptionSettingsCollection.enabled == true | project name, type, kind, identity, tenantId, properties.tenantId" --subscriptions $subscription --output json > aaddependencies-$j.json
 done
-
-# List Azure SQL databases with AAD authentication to reproduce in the new directory
-az sql server ad-admin list --ids $(az graph query -q "resources | where type == 'microsoft.sql/servers' | project id" -o tsv |  cut -f1) > sql.json
-
-# List other resources with known Azure AD dependencies
-subscription=$(az account show --query id | sed -e 's/^"//' -e 's/"$//')
-az graph query -q "resources | where type != 'microsoft.azureactivedirectory/b2cdirectories' | where identity <> '' or properties.tenantId <> '' or properties.encryptionSettingsCollection.enabled == true | project name, type, kind, identity, tenantId, properties.tenantId" --subscriptions $subscription --output json > aaddependencies.json
 
 # Clear data export settings from AAD tenant
 uri="https://management.azure.com/providers/microsoft.aadiam/diagnosticSettings?api-version=2017-04-01"
