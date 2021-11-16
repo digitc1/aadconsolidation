@@ -84,19 +84,24 @@ do
 	# Set Azure Subscription
 	az account set --subscription $j
 
+	mkdir $j
+	cd $j
+	
 	# Save all keyvaults configuration to json files to reproduce access to key and secret in the new directory
 	keyvaults=$(az keyvault list --query [].name --output tsv)
 	for i in $keyvaults;
 	do
-        az keyvault show --name $i > "kv-$i-$j.json"
+        az keyvault show --name $i > "kv-$i.json"
 	done
 
 	# List Azure SQL databases with AAD authentication to reproduce in the new directory
-	az sql server ad-admin list --ids $(az graph query -q "resources | where type == 'microsoft.sql/servers' | project id" -o tsv |  cut -f1) > sql-$j.json
+	az sql server ad-admin list --ids $(az graph query -q "resources | where type == 'microsoft.sql/servers' | project id" -o tsv |  cut -f1) > sql.json
 
 	# List other resources with known Azure AD dependencies
 	subscription=$(az account show --query id | sed -e 's/^"//' -e 's/"$//')
 	az graph query -q "resources | where type != 'microsoft.azureactivedirectory/b2cdirectories' | where identity <> '' or properties.tenantId <> '' or properties.encryptionSettingsCollection.enabled == true | project name, type, kind, identity, tenantId, properties.tenantId" --subscriptions $subscription --output json > aaddependencies-$j.json
+	
+	cd ..
 done
 
 # Clear data export settings from AAD tenant
