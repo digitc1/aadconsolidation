@@ -24,13 +24,13 @@ If the Azure Shell uses PowerShell by default, click on the switch button to swi
 
 ![This is a alt text.](/images/switch-cli.png "Picture showing how to switch to Azure CLI.")
 
-In Azure CLI, run the following code:
+In Azure CLI, run the following code (optionnaly use the --subscription parameter to perform the backup for a specific subscription):
 
 ```
 curl https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/source.sh --output script.sh
 chmod +x script.sh
 az login
-./script.sh [SUBSCRIPTION_NAME}
+./script.sh [--subscription contoso]
 rm script.sh
 ```
 

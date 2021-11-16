@@ -66,9 +66,6 @@ done
 # Get External Collaboration settings - Backup only
 az rest --method GET --uri "https://graph.microsoft.com/beta/legacy/policies" | jq '.value[] | select(.definition[] | contains ("InvitationsAllowedAndBlockedDomainsPolicy"))' > InvitationsAllowedAndBlockedDomainsPolicy.json
 
-# Save all role assignments, including inherited role assignments and export the output to json
-az role assignment list --all --include-inherited --output json > roleassignments.json
-
 # Save all custom roles to an external json file, to be recreated in the destination tenant
 az role definition list --custom-role-only true --output json > customroles.json
 
@@ -87,6 +84,9 @@ do
 	mkdir $j
 	cd $j
 	
+	# Save all role assignments, including inherited role assignments and export the output to json
+	az role assignment list --all --include-inherited --output json > roleassignments.json
+
 	# Save all keyvaults configuration to json files to reproduce access to key and secret in the new directory
 	keyvaults=$(az keyvault list --query [].name --output tsv)
 	for i in $keyvaults;
