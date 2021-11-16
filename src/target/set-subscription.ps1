@@ -120,8 +120,10 @@ $roleAssignments | ForEach-Object -Process {
                 $objectId = (Get-AzADGroup -DisplayName $principalName).Id
 		    }
 		    "ServicePrincipal" { 
-                $mapping = Get-Content -Path ../mappingOldAppNewSP.json | ConvertFrom-Json
-                $objectId = ($mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName})[0].newServicePrincipal
+                $mapping = Get-Content -Path ../mappingTable.json | ConvertFrom-Json
+                $appId = $mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName}
+                $ServicePrincipal = Get-AzADServicePrincipal -ApplicationId $appId
+                $objectId = $ServicePrincipal.Id
 		    }
 		    default {
 			    Write-Host "Role assignment cannot be assigned, unknown principal type: $_.principalType"
