@@ -30,6 +30,8 @@ ForEach($AzADApp in $AzAdApps){
         #Recreating Azure AD apps based from backed up Json file
         $NewApp = New-AzureADApplication -DisplayName $AzAdApp.DisplayName
         $NewSPN = New-AzureADServicePrincipal -AppId $NewApp.AppId
+
+        Start-Sleep -s 15
         
         $mapping = New-Object -TypeName psobject
         $mapping | Add-Member -MemberType NoteProperty -Name "oldAppId" -Value $AzAdApp.appId
