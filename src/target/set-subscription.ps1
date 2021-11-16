@@ -1,4 +1,6 @@
 $vaultName = ""
+$subscriptionId = (Get-AzContext).Subscription.Id
+Set-Location -Path $subscriptionId
 
 if(!(Get-AzResourceGroup | Where-Object {$_.ResourceGroupName -eq "autocreate_rg"})){
 	New-AzResourceGroup -Name "autocreate_rg" -Location "westeurope" -Tag @{state="DONOTDELETE"}
@@ -127,7 +129,7 @@ $roleAssignments | ForEach-Object -Process {
 
 # Update keyvaults
 Write-Host "checking keyvaults" -ForegroundColor yellow
-$userList = Get-Content userList.json | ConvertFrom-Json
+$userList = Get-Content ../userList.json | ConvertFrom-Json
 Get-ChildItem -Filter kv-*.json | ForEach-Object {
 	$content = Get-Content $_.FullName | ConvertFrom-Json
 	$vault = Get-AzResource -ResourceId $content.Id -ExpandProperties
@@ -175,3 +177,4 @@ $sql | ForEach-Object -Process {
         Write-Host "Cannot find any corresponding object id for user" $login
     }
 }
+Set-Location -Path ..
