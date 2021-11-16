@@ -134,7 +134,9 @@ Get-ChildItem -Filter kv-*.json | ForEach-Object {
 	$content = Get-Content $_.FullName | ConvertFrom-Json
 	$vault = Get-AzResource -ResourceId $content.Id -ExpandProperties
 	Write-Host "configuring keyvault" $vault.name
-	$vault.Properties.TenantId = $context.Tenant.TenantId
+	$vault.Properties.TenantId = (Get-AzContext).Tenant.TenantId
+    Write-Host "tenantid is: $((Get-AzContext).Tenant.TenantId)"
+    Write-Host "vault tenantid is: $($vault.Properties.TenantId)"
 	$vault.Properties.AccessPolicies = @()
 	$vaultName = $vault.name
     Set-AzResource -ResourceId $vault.Id -Properties $vault.Properties -Force
