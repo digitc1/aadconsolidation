@@ -66,9 +66,6 @@ done
 # Get External Collaboration settings - Backup only
 az rest --method GET --uri "https://graph.microsoft.com/beta/legacy/policies" | jq '.value[] | select(.definition[] | contains ("InvitationsAllowedAndBlockedDomainsPolicy"))' > InvitationsAllowedAndBlockedDomainsPolicy.json
 
-# Save all custom roles to an external json file, to be recreated in the destination tenant
-az role definition list --custom-role-only true --output json > customroles.json
-
 # List system assigned identities and user assigned identity
 az ad sp list --all --filter "servicePrincipalType eq 'ManagedIdentity'" > managedidentities.json
 az ad sp list --all --filter "servicePrincipalType eq 'Application'" > applicationIdentities.json
@@ -84,6 +81,9 @@ do
 	mkdir $j
 	cd $j
 	
+	# Save all custom roles to an external json file, to be recreated in the destination tenant
+	az role definition list --custom-role-only true --output json > customroles.json
+
 	# Save all role assignments, including inherited role assignments and export the output to json
 	az role assignment list --all --include-inherited --output json > roleassignments.json
 
