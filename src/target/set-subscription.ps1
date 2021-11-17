@@ -122,7 +122,9 @@ $roleAssignments | ForEach-Object -Process {
 		    "ServicePrincipal" { 
                 $mapping = Get-Content -Path ../mappingTable.json | ConvertFrom-Json
                 $appId = ($mapping | Where-Object {$_.oldAppId -eq $roleAssignment.principalName}).newAppId
+                Write-Host "app id: $appId"
                 $ServicePrincipal = Get-AzADServicePrincipal -ApplicationId $appId
+                Write-Host $ServicePrincipal
                 $objectId = $ServicePrincipal.Id
 		    }
 		    default {
@@ -144,6 +146,7 @@ $roleAssignments | ForEach-Object -Process {
         }
     } catch {
         Write-Host "User cannot be assigned. Check if user is in the directory"
+        Write-Host $error
     }
 }
 
