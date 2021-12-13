@@ -79,15 +79,15 @@ ForEach ($automationAccount in $automationAccounts) {
 
                 Write-Host "Link Azure AD application and automation account with certificate"
                 $AzKeyVaultCertificatStringValue = [System.Convert]::ToBase64String($certCollection.GetRawCertData())
-                #New-AzADAppCredential -ApplicationId $automationApplication.ApplicationId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter
-                #$automationAppCredential = Get-AzADAppCredential -ApplicationId $automationApplication.ApplicationId
-                $automationAppCredential = New-AzADAppCredential -ApplicationId $automationApplication.ApplicationId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter -CustomKeyIdentifier "RunAsAccount"
-                #$AzADServicePrincipal = New-AzADServicePrincipal -ApplicationId $automationApplication.ApplicationId -SkipAssignment
-                $automationADServicePrincipal = Get-AzADServicePrincipal -ApplicationId $automationApplication.ApplicationId
+                #New-AzADAppCredential -ApplicationId $automationApplication.AppId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter
+                #$automationAppCredential = Get-AzADAppCredential -ApplicationId $automationApplication.AppId
+                $automationAppCredential = New-AzADAppCredential -ApplicationId $automationApplication.AppId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter -CustomKeyIdentifier "RunAsAccount"
+                #$AzADServicePrincipal = New-AzADServicePrincipal -ApplicationId $automationApplication.AppId -SkipAssignment
+                $automationADServicePrincipal = Get-AzADServicePrincipal -ApplicationId $automationApplication.AppId
                 Set-AzAutomationCertificate -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Path $PfxFilePath -Name $automationAccount.AutomationAccountName -Password $secretPassword -Exportable:$Exportable
 
                 $ConnectionFieldData = @{
-                        "ApplicationId" = $automationApplication.ApplicationId
+                        "ApplicationId" = $automationApplication.AppId
                         "TenantId" = (Get-AzContext).Tenant.ID
                         "CertificateThumbprint" = $certCollection.Thumbprint
                         "SubscriptionId" = (Get-AzContext).Subscription.ID
