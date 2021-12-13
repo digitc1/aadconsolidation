@@ -3,7 +3,7 @@
 
 # Switch to the correct subscription
 if [ "$1" ]; then
-	list=$(az account show --subscription $var --query id --output tsv);
+	list=$(az account show --subscription $1 --query id --output tsv);
 	echo "Subscription successfully loaded:" $test
 else
 	list=$(az account list --query [].id --output tsv)
