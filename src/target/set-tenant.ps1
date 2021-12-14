@@ -25,7 +25,7 @@ $mappingTable = @()
 
 ForEach($AzADApp in $AzAdApps){
     if(($AzADApp.DisplayName -notlike "*RunAsAccount*") -And ($AzADApp.DisplayName -notlike "*lzslzAutomation*") -And ($AzAdApp.DisplayName -ne "OptionalClaimsApp") -And ($AzADApp.DisplayName -notlike "*aad-extension-app*") -And ($AzADApp.DisplayName -notlike "*Learn On Demand*") -And ($AzADApp.DisplayName -notlike "*Tenant Schema Extension App*") -And ($AzADApp.DisplayName -notlike "*Cost-Monitor-Account*")){
-        Write-host "Recreating Azure AD appliction "$AzAdApp.DisplayName
+        Write-host "Recreating Azure AD application "$AzAdApp.DisplayName
 
         #Recreating Azure AD apps based from backed up Json file
         $NewApp = New-AzureADApplication -DisplayName $AzAdApp.DisplayName
