@@ -86,8 +86,10 @@ ForEach ($automationAccount in $automationAccounts) {
                 $automationADServicePrincipal = Get-AzADServicePrincipal -ApplicationId $automationApplication.AppId
                 Set-AzAutomationCertificate -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Path $PfxFilePath -Name $automationAccount.AutomationAccountName -Password $secretPassword -Exportable:$Exportable
 
+                $mapping = Get-Content -Path ../mappingTable.json | ConvertFrom-Json
+                $appId = ($mapping | Where-Object {$_.oldAppId -eq $automationApplication.AppId}).newAppId
                 $ConnectionFieldData = @{
-                        "ApplicationId" = $automationApplication.AppId
+                        "ApplicationId" = $appId
                         "TenantId" = (Get-AzContext).Tenant.ID
                         "CertificateThumbprint" = $certCollection.Thumbprint
                         "SubscriptionId" = (Get-AzContext).Subscription.ID
