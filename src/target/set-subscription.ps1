@@ -84,7 +84,7 @@ ForEach ($automationAccount in $automationAccounts) {
                 $automationAppCredential = New-AzADAppCredential -ApplicationId $automationApplication.AppId -CertValue $AzKeyVaultCertificatStringValue -StartDate $certCollection.NotBefore -EndDate $certCollection.NotAfter -CustomKeyIdentifier "RunAsAccount"
                 #$AzADServicePrincipal = New-AzADServicePrincipal -ApplicationId $automationApplication.AppId -SkipAssignment
                 $automationADServicePrincipal = Get-AzADServicePrincipal -ApplicationId $automationApplication.AppId
-                New-AzAutomationCertificate -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Path $PfxFilePath -Name $automationAccount.AutomationAccountName -Password $secretPassword -Exportable:$Exportable
+                New-AzAutomationCertificate -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Path $PfxFilePath -Name "AzureRunAsCertificate" -Password $secretPassword -Exportable:$Exportable
 
                 #$mapping = Get-Content -Path ../mappingTable.json | ConvertFrom-Json
                 #$appId = ($mapping | Where-Object {$_.oldAppId -eq $automationApplication.AppId}).newAppId
