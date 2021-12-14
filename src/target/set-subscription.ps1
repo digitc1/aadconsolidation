@@ -95,7 +95,7 @@ ForEach ($automationAccount in $automationAccounts) {
                         "SubscriptionId" = (Get-AzContext).Subscription.ID
                 }
 
-                Write-Host "$ConnectionFieldData"
+                Write-Host $($ConnectionFieldData | ConvertTo-Json -Depth 5)
                 New-AzAutomationConnection -ResourceGroupName $automationAccount.ResourceGroupName -AutomationAccountName $automationAccount.AutomationAccountName -Name "AzureRunAsConnection" -ConnectionTypeName "AzureServicePrincipal" -ConnectionFieldValues $ConnectionFieldData
         } else {
                 Write-Host "No 'Run as account' linked to the automation account '$($automationAccount.AutomationAccountName)'. Skipping creation of the run as account"
