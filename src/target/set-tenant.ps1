@@ -323,6 +323,43 @@ ForEach($AzADApp in $AzAdApps){
 	}
 }
 
+#Recreating user assigned applications
+ForEach($oldUser in $userList){
+	$user = Get-AzADUser | ?{$_.displayName -eq $oldUser.displayName}
+	if (!($user -eq $null)){
+		$b = Get-content "AppRoleAssignment_$($oldUser.displayName).json" | ConvertFrom-json
+		$list = $b.value.resourceDisplayName
+
+		ForEach($AssApp in $list){
+   			if(!($AssApp -eq "MicrosoftAzureActiveAuthn")){
+        			Write-Host "Starting with " $assapp
+        			Write-Host "user: " $user.Id
+        			# Get the service principal for the app you want to assign the user to
+        			$servicePrincipal = Get-AzAdServicePrincipal | Where{$_.displayName -eq $AssApp}
+        			Write-Host "SPN: " $servicePrincipal.Id
+
+        			# Create the user app role assignment
+        			$newApp = Get-AzureADApplication | ?{$_.displayName -eq $AssApp}
+				Write-Host "App: " $newApp.displayname
+
+            			If($newApp.approles.count -eq "0"){  
+                			New-AzureADUserAppRoleAssignment -ObjectId $user.Id -PrincipalId $user.Id -ResourceId $servicePrincipal.Id -Id ([Guid]::Empty)
+           			}Else{
+                			$arcId = ($b.value | where{$_.resourceDisplayName -eq $AssApp}).approleId		
+					$oldApplicationObjectId = ($AzAdApps | where{$_.displayName -eq $AssApp}).ObjectId
+					$oldAppRoles = (Get-Content "appmanifest-$($oldApplicationObjectId).json" | ConvertFrom-Json).appRoles
+					forEach($role in $oldAppRoles){
+						if($role.id -eq $arcId){
+							$newRoleId = ($newApp.appRoles | where{$_.displayName -eq $role.displayName}).Id
+							New-AzureADUserAppRoleAssignment -ObjectId $user.Id -PrincipalId $user.Id -ResourceId $servicePrincipal.Id -Id $newRoleId
+						}
+					}
+        			}
+    			}
+		}
+	}
+}
+
 #Recreate User assigned identities
 Write-Host "checking user assigned identities" -ForegroundColor yellow
 $userAssignedIdentities = Get-Content useridentity.json | ConvertFrom-Json
