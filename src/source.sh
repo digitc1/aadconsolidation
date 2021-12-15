@@ -73,6 +73,17 @@ az ad sp list --all --filter "servicePrincipalType eq 'Application'" > applicati
 # List user assigned managed identities only
 az identity list > useridentity.json
 
+users=$(az ad user list --query [].objectId --output tsv)
+
+
+
+for u in $users
+
+do
+  name=$(az ad user show --id $u --query displayName --output tsv)
+  az rest --method GET --uri "https://graph.microsoft.com/v1.0/users/$u/appRoleAssignments" > "AppRoleAssignment_$name.json"
+done
+
 for j in $list
 do
 	# Set Azure Subscription
