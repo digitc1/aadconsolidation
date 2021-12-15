@@ -137,13 +137,13 @@ ForEach($AzADApp in $AzAdApps){
         #Add secret to Azure AD application
         $creds = $AzAdApp | Select passwordcredentials, keycredentials
 
-        if(!($null -eq $creds.PasswordCredentials.count)){
+        if($creds.PasswordCredentials.count -gt 0){
             Write-host "Recreating Secret..." -ForegroundColor Green
             $startDate = Get-Date
             $endDate = $startDate.AddYears(2)
             $aadAppsecret01 = New-AzureADApplicationPasswordCredential -ObjectId $NewApp.ObjectId -CustomKeyIdentifier "Secret01" -StartDate $startDate -EndDate $endDate
             Write-Host "The new secret is valid for 2 years. The secret value is: " $aadAppsecret01.value -ForegroundColor Green
-        }Elseif(!($null -eq $creds.KeyCredentials.count)){
+        }Elseif($creds.KeyCredentials.count -gt 0){
             Write-Host "Certificate used for application. Please recreate and reattach certificate." -ForegroundColor Yellow
         }Else{
             Write-Host "No credentials found on the application."
