@@ -17,7 +17,7 @@ if(!(Get-ChildItem -Name "aadmigration.tar.gz")){
 tar -xvzf aadmigration.tar.gz
 Set-Location -Path aadmigration
 
-Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target/get-userId.ps1 -OutFile get-userId.ps1
+Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target/get-userId.ps1 -OutFile userId.ps1
 
 Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target/set-tenant.ps1 -OutFile tenant.ps1
 ./tenant.ps1
@@ -31,5 +31,5 @@ ForEach ($subscription in $subscriptionList){
 }
 Remove-Item subscription.ps1
 
-Remove-Item get-userId.ps1
+Remove-Item userId.ps1
 Set-Location ../
