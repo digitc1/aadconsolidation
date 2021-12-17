@@ -52,7 +52,7 @@ ForEach($AzADApp in $AzAdApps){
 				Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
 			 }else{
 				Write-Host "Owner of the application is" $owner.userPrincipalName
-				$ownerObjectId = ./get-userId.ps1 $owner.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+				$ownerObjectId = ./userId.ps1 $owner.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 				#(Get-AzADUser | Where-Object {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 				if($null -eq $ownerObjectId){
 				   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
@@ -397,7 +397,7 @@ Get-ChildItem -Filter groupMember-*.json | ForEach-Object {
     $content | ForEach-Object -Process {
         $principalName = $_.userPrincipalName
         Write-Host "Checking membership for "$principalName
-        $objectId = ./get-userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+        $objectId = ./userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 	#(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
         if(!($objectId)){
             Write-Host "User cannot be found and assigned group membership" $principalName
@@ -424,7 +424,7 @@ Get-ChildItem -Filter groupOwner-*.json | ForEach-Object {
     $content | ForEach-Object -Process {
         $principalName = $_.userPrincipalName
         Write-Host "Checking ownership for "$principalName
-        $objectId = ./get-userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+        $objectId = ./userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 	#(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
         if(!($objectId)){
             Write-Host "User cannot be found and assigned ownership of the group" $principalName
