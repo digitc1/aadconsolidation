@@ -6,6 +6,9 @@ Write-Host "Installation of the modules needed for this script"
 Install-Module -Name 'Az.ManagedServiceIdentity'
 $CertificateSubjectName = "CN=EU,OU=EU,O=org,L=Brussels,S=Belgium,C=BE"
 $DNSSuffix = "ec.europa.eu"
+#To add more subdomains, just add them to the following string including the separaton | between each one. For example: "ext.ec.europa.eu|ext2.ec.europa.eu"
+$subdomainDNSSuffix = "ext.ec.europa.eu"
+
 #$centralKeyVault = "" # To be created
 
 Write-Host "extracting source files"
