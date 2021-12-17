@@ -1,9 +1,5 @@
 #az login might be required via device auth code flow for admin consent (added warning message to start of the script)...
 
-$DNSSuffix = "ec.europa.eu"
-#To add more subdomains, just add them to the following string including the separaton | between each one. For example: "ext.ec.europa.eu|ext2.ec.europa.eu"
-$subdomainDNSSuffix = "ext.ec.europa.eu"
-
 #Check users if the old tenant and try to reinvite in the new tenant if they were invited from EC
 $userList = Get-Content userList.json | ConvertFrom-Json
 ForEach($user in $userList){
