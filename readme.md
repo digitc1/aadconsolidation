@@ -29,7 +29,7 @@ In Azure CLI, run the following code (optionnaly use the --subscription paramete
 ```
 curl https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/source.sh --output script.sh
 chmod +x script.sh
-az login
+az login --tenant [TENANT_ID]
 ./script.sh [--subscription contoso]
 rm script.sh
 ```
@@ -57,8 +57,9 @@ In Azure Shell, run the following code:
 
 ```
 Invoke-WebRequest -URI https://raw.githubusercontent.com/digitc1/aadconsolidation/main/src/target.ps1 -OutFile script.ps1
-Connect-AzureAD
-az login
+Connect-AzureAD -tenant [TENANT_ID]
+Connect-AzAccount -tenant [TENANT_ID]
+az login --tenant [TENANT_ID]
 ./script.ps1
 rm script.ps1
 ```
