@@ -1,6 +1,8 @@
 #az login might be required via device auth code flow for admin consent (added warning message to start of the script)...
 
 $DNSSuffix = "ec.europa.eu"
+#To add more subdomains, just add them to the following string including the separaton | between each one. For example: "ext.ec.europa.eu|ext2.ec.europa.eu"
+$subdomainDNSSuffix = "ext.ec.europa.eu"
 
 #Check users if the old tenant and try to reinvite in the new tenant if they were invited from EC
 $userList = Get-Content userList.json | ConvertFrom-Json
@@ -50,7 +52,8 @@ ForEach($AzADApp in $AzAdApps){
 				Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
 			 }else{
 				Write-Host "Owner of the application is" $owner.userPrincipalName
-				$ownerObjectId = (Get-AzADUser | Where-Object {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+				$ownerObjectId = ./get-userId.ps1 $owner.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+				#(Get-AzADUser | Where-Object {$_.Mail -match $owner.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 				if($null -eq $ownerObjectId){
 				   Write-host "Not able to find the owner in the directory." -ForegroundColor Yellow
 				}Else{
@@ -394,7 +397,8 @@ Get-ChildItem -Filter groupMember-*.json | ForEach-Object {
     $content | ForEach-Object -Process {
         $principalName = $_.userPrincipalName
         Write-Host "Checking membership for "$principalName
-        $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+        $objectId = ./get-userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+	#(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
         if(!($objectId)){
             Write-Host "User cannot be found and assigned group membership" $principalName
         } else {
@@ -420,7 +424,8 @@ Get-ChildItem -Filter groupOwner-*.json | ForEach-Object {
     $content | ForEach-Object -Process {
         $principalName = $_.userPrincipalName
         Write-Host "Checking ownership for "$principalName
-        $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+        $objectId = ./get-userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+	#(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
         if(!($objectId)){
             Write-Host "User cannot be found and assigned ownership of the group" $principalName
         } else {
