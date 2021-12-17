@@ -114,7 +114,7 @@ $roleAssignments | ForEach-Object -Process {
         $objectId = ""
 	    switch($_.principalType){
 		    "User" {
-			    $objectId = ./userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+			    $objectId = ../userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 			    #(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 		    }
 		    "Group" {
@@ -175,7 +175,7 @@ Get-ChildItem -Filter kv-*.json | ForEach-Object {
         $user = $userList | Where-Object {$_.objectId -eq $objectId}
         if($user) {
             Write-Host "Recreating access policy for user $($user.userPrincipalName)"
-            $newUserId = ./userId.ps1 $user.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+            $newUserId = ../userId.ps1 $user.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 	    #(Get-AzADUser | Where-Object {$_.Mail -match $user.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
             $newUserId
             if($newUserId){
@@ -196,7 +196,7 @@ $sql | ForEach-Object -Process {
 	Write-Host "reconfigure server" $_.id.split('/')[8]
 	$login = $_.login
     try {
-	    $objectId = ./userId.ps1 $login.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+	    $objectId = ../userId.ps1 $login.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
 	    #(Get-AzADUser | Where-Object {$_.Mail -match $login.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 	    if($objectId){
             Write-Host "Assigning sql server admin to $objectId"
