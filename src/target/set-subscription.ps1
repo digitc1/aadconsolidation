@@ -114,7 +114,8 @@ $roleAssignments | ForEach-Object -Process {
         $objectId = ""
 	    switch($_.principalType){
 		    "User" {
-			    $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+			    $objectId = ./get-userId.ps1 $principalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+			    #(Get-AzADUser | Where-Object {$_.Mail -match $principalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 		    }
 		    "Group" {
                 if(!(Get-AzADGroup -DisplayName $principalName)){
@@ -174,7 +175,8 @@ Get-ChildItem -Filter kv-*.json | ForEach-Object {
         $user = $userList | Where-Object {$_.objectId -eq $objectId}
         if($user) {
             Write-Host "Recreating access policy for user $($user.userPrincipalName)"
-            $newUserId = (Get-AzADUser | Where-Object {$_.Mail -match $user.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+            $newUserId = ./get-userId.ps1 $user.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+	    #(Get-AzADUser | Where-Object {$_.Mail -match $user.userPrincipalName.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
             $newUserId
             if($newUserId){
                 Set-AzKeyVaultAccessPolicy -ObjectId $newUserId -VaultName $vaultName -PermissionsToKeys $permissions.keys -PermissionsToSecrets $permissions.secrets -PermissionsToCertificates $permissions.certificates -PassThru
@@ -194,7 +196,8 @@ $sql | ForEach-Object -Process {
 	Write-Host "reconfigure server" $_.id.split('/')[8]
 	$login = $_.login
     try {
-	    $objectId = (Get-AzADUser | Where-Object {$_.Mail -match $login.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
+	    $objectId = ./get-userId.ps1 $login.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
+	    #(Get-AzADUser | Where-Object {$_.Mail -match $login.split('_')[0].split('@')[0] -And $_.Mail -like "*$DNSSuffix*"}).Id
 	    if($objectId){
             Write-Host "Assigning sql server admin to $objectId"
             Set-AzSqlServerActiveDirectoryAdministrator -objectId $objectId -ResourceGroupName $_.resourceGroup -ServerName ($_.id.split('/')[8]) -DisplayName "DBAs"
