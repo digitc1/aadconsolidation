@@ -3,7 +3,7 @@
 #Check users if the old tenant and try to reinvite in the new tenant if they were invited from EC
 $userList = Get-Content userList.json | ConvertFrom-Json
 ForEach($user in $userList){
-    if($user.mail -Like ("*@*ec.europa.eu")){
+    if($user.mail -Like ("*@*$DNSSuffix")){
         Write-Host "Checking user $($user.mail)"
         if(Get-AzADUser -Mail $user.mail){
             Write-Host "User already added in the consolidated tenant"
