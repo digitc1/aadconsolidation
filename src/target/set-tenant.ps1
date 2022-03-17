@@ -374,7 +374,7 @@ $content | ForEach-Object -Process {
     if($_.onPremisesDomainName -eq $null){
         if(!(Get-AzADGroup -DisplayName $_.displayName)){
             Write-Host "Recreating the group" $_.displayName
-            New-AzADGroup -DisplayName $_.displayName -MailNickName $_.displayName | Out-Null
+            New-AzADGroup -DisplayName $_.displayName -MailNickName $_.mailNickname | Out-Null
         }
     }  Else {
         Write-host $_.displayName "is a group synced from On-Premises."
