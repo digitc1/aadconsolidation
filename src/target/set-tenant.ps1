@@ -190,21 +190,6 @@ ForEach($AzADApp in $AzAdApps){
 		Write-Host "Skip public clients because app identifier uris is empty"
 	}
 
-        #Implicit ID Token
-        #$StateIdToken = az ad app list --app-id $AzADApp.appId | ConvertFrom-Json     
-        $idToken = $AzADapp.oauth2allowidtokenimplicitflow
-        $OID = $newApp.ObjectId
-
-        If($idtoken -eq $false){
-        #azure CLI command, no PSH counterpart
-            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$OID" --headers 'Content-Type=application/json' --body '{"web":{"implicitGrantSettings":{"enableIdTokenIssuance":false}}}'
-            Write-Host "Blocked Implicit flow ID token" -ForegroundColor Green
-        }Else{
-        #acure CLI command, no PSH counterpart
-            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$OID" --headers 'Content-Type=application/json' --body '{"web":{"implicitGrantSettings":{"enableIdTokenIssuance":true}}}'
-            Write-Host "Allowed Implicit flow ID token" -ForegroundColor Yellow
-        }
-
         #Exposed API's
         Try{
             If(!($null -eq $AzAdApp.identifierUris)){
@@ -261,6 +246,21 @@ ForEach($AzADApp in $AzAdApps){
 	}
 
         Start-sleep -seconds 20
+	
+	 #Implicit ID Token
+        #$StateIdToken = az ad app list --app-id $AzADApp.appId | ConvertFrom-Json     
+        $idToken = $AzADapp.oauth2allowidtokenimplicitflow
+        $OID = $newApp.ObjectId
+
+        If($idtoken -eq $false){
+        #azure CLI command, no PSH counterpart
+            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$OID" --headers 'Content-Type=application/json' --body '{"web":{"implicitGrantSettings":{"enableIdTokenIssuance":false}}}'
+            Write-Host "Blocked Implicit flow ID token" -ForegroundColor Green
+        }Else{
+        #acure CLI command, no PSH counterpart
+            az rest --method PATCH --uri "https://graph.microsoft.com/v1.0/applications/$OID" --headers 'Content-Type=application/json' --body '{"web":{"implicitGrantSettings":{"enableIdTokenIssuance":true}}}'
+            Write-Host "Allowed Implicit flow ID token" -ForegroundColor Yellow
+        }
 	
         #AZ Cli call test for admin consent
 		$AppId = $NewApp.AppId
