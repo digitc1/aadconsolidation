@@ -8,7 +8,7 @@ ForEach($user in $userList){
         if(Get-AzADUser -Mail $user.mail){
             Write-Host "User already added in the consolidated tenant"
         } else {
-            New-AzureADMSInvitation -InvitedUserEmailAddress $user.mail -SendInvitationMessage $True -InviteRedirectUrl "http://myapps.microsoft.com"
+            az rest --method POST --uri "https://graph.microsoft.com/v1.0/invitations" --body "{\""invitedUserEmailAddress\"": \""$user.mail\"", \""inviteRedirectUrl\"": \""http://myapps.microsoft.com\""}" --headers '{\"Content-Type\":\"application/json\"}'
         }
     } else {
         Write-Host "user email not supported"
