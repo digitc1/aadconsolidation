@@ -46,11 +46,11 @@ ForEach($AzADApp in $AzAdApps){
 	$BackupFile = Get-childitem -Path . | where-Object {$_.name -like "*application*$oldOid*"} 
 	$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
 	If(($null -eq $BackupAppOwner)){
-		Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
+		Write-Host "Azure Ad app $($AzADApp.DisplayName) has no owner assigned."
 	}Else{
 		ForEach($owner in $BackupAppOwner){
 			 if($null -eq $owner.userPrincipalName){
-				Write-Host "Azure Ad app $AzADApp.DisplayName has no owner assigned."
+				Write-Host "Azure Ad app $($AzADApp.DisplayName) has no owner assigned."
 			 }else{
 				Write-Host "Owner of the application is" $owner.userPrincipalName
 				$ownerObjectId = ./userId.ps1 $owner.userPrincipalName.split('_')[0].split('@')[0] $DNSSuffix $subdomainDNSSuffix
