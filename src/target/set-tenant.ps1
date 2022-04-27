@@ -9,8 +9,8 @@ ForEach($user in $userList){
 		if(Get-AzADUser -Mail $user.mail){
            		Write-Host "User already added in the consolidated tenant"
        		} else {
-			Write-Host "Inviting user $user.mail to the consolidated tenant"
-            		az rest --method POST --uri "https://graph.microsoft.com/v1.0/invitations" --body "{\""invitedUserEmailAddress\"": \""$user.mail\"", \""inviteRedirectUrl\"": \""http://myapps.microsoft.com\""}" --headers '{\"Content-Type\":\"application/json\"}'
+			Write-Host "Inviting user $($user.mail) to the consolidated tenant"
+            		az rest --method POST --uri "https://graph.microsoft.com/v1.0/invitations" --body "{\""invitedUserEmailAddress\"": \""$($user.mail)\"", \""inviteRedirectUrl\"": \""http://myapps.microsoft.com\""}" --headers '{\"Content-Type\":\"application/json\"}'
         	}
 	} catch {
             Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
