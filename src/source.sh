@@ -147,7 +147,7 @@ sleep 10
 az ad app permission admin-consent --id $(echo $pim | cut -d' ' -f1)
 
 sleep 30
-az login --service-principal -u $(echo $pim | cut -d' ' -f1) -p $(echo $pim | cut -d' ' -f4) -t $(echo $pim | cut -d' ' -f5)
+az login --service-principal -u $(echo $pim | cut -d' ' -f1) -p $(echo $pim | cut -d' ' -f3) -t $(echo $pim | cut -d' ' -f4)
 
 az rest --method GET --uri "https://graph.microsoft.com/beta/roleManagement/directory/roleEligibilitySchedules" > pim.json
 
