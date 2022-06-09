@@ -33,7 +33,7 @@ az ad app list > AADapplications.json
 az ad app list --query '[].{objectId:objectId, displayName:displayName}' --output tsv > aadappref.json
 
 # Get azure ad application owners
-apps=$(az ad app list --query [].objectId --output tsv)
+apps=$(az ad app list --query [].id --output tsv)
 for i in $apps
 do
 	az ad app owner list --id $i > "application-$i.json"
