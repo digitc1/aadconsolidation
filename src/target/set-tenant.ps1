@@ -41,7 +41,7 @@ ForEach($AzADApp in $AzAdApps){
         $mappingTable += $mapping
 
         #Add Application owner
-        $OldOId=$AzADApp.ObjectId
+        $OldOId=$AzADApp.id
 	Write-host $OldOId
 	$BackupFile = Get-childitem -Path . | where-Object {$_.name -like "*application*$oldOid*"} 
 	$BackupAppOwner = Get-Content $BackupFile | ConvertFrom-Json
