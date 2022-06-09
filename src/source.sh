@@ -19,7 +19,7 @@ az extension add --name resource-graph
 # Get an extract of the Azure AD
 az ad user list > userList.json
 az ad group list > groupList.json
-groups=$(az ad group list --query [].objectId --output tsv)
+groups=$(az ad group list --query [].id --output tsv)
 for i in $groups
 do
 	az ad group member list -g $i > "groupMember-$i.json"
@@ -30,7 +30,7 @@ done
 az ad app list > AADapplications.json
 
 #Get Azure AD app ObjectId Reference
-az ad app list --query '[].{objectId:objectId, displayName:displayName}' --output tsv > aadappref.json
+az ad app list --query '[].{id:id, displayName:displayName}' --output tsv > aadappref.json
 
 # Get azure ad application owners
 apps=$(az ad app list --query [].id --output tsv)
