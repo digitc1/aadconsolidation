@@ -177,7 +177,7 @@ ForEach($AzADApp in $AzAdApps){
         Write-host "Verified Implicit flow status..."
 
         #Public clients
-	If(!($null -eq $AzAdApp.identifierUris)){
+	If(!(0 -eq $AzAdApp.identifierUris.Length)){
 		$public = $AzADApp.PublicClient
 
 		If(($null -eq $public) -or ($public -eq $false)){
@@ -191,7 +191,6 @@ ForEach($AzADApp in $AzAdApps){
 	}
 
         #Exposed API's
-	Write-host $AzAdApp.identifierUris -ForegroundColor DarkMagenta
         Try{
             If(!($null -eq $AzAdApp.identifierUris)){
 		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
