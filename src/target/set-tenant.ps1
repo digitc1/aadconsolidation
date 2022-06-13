@@ -191,7 +191,7 @@ ForEach($AzADApp in $AzAdApps){
 	}
 
         #Exposed API's
-	Write-host $AzAdApp.identifierUris -ForegroundColor Orange
+	Write-host $AzAdApp.identifierUris -ForegroundColor DarkMagenta
         Try{
             If(!($null -eq $AzAdApp.identifierUris)){
 		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
