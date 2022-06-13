@@ -146,6 +146,8 @@ az ad app permission grant --id $(echo $pim | cut -d' ' -f1) --api 00000003-0000
 sleep 10
 az ad app permission admin-consent --id $(echo $pim | cut -d' ' -f1)
 
+az role assignment create --assignee $(echo $pim | cut -d' ' -f1) --role "acdd72a7-3385-48ef-bd42-f606fba81ae7" --subscription "$(az account list --query '[0]'.id --output tsv)"
+
 sleep 30
 az login --service-principal -u $(echo $pim | cut -d' ' -f1) -p $(echo $pim | cut -d' ' -f3) -t $(echo $pim | cut -d' ' -f4)
 
