@@ -73,7 +73,7 @@ az ad sp list --all --filter "servicePrincipalType eq 'Application'" > applicati
 # List user assigned managed identities only
 az identity list > useridentity.json
 
-users=$(az ad user list --query [].objectId --output tsv)
+users=$(az ad user list --query [].id --output tsv)
 
 
 
