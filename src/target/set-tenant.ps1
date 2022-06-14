@@ -392,7 +392,7 @@ $groupList = Get-Content groupList.json | ConvertFrom-Json
 Get-ChildItem -Filter groupMember-*.json | ForEach-Object {
 	$content = Get-Content $_.FullName | ConvertFrom-Json
     $groupObjectId = $_.name.Substring(12, 36)
-    $oldGroup = $groupList | where-Object {$_.ObjectId -eq $groupObjectId}
+    $oldGroup = $groupList | where-Object {$_.id -eq $groupObjectId}
     Write-Host "Checking members for group " $oldGroup.displayName
     $group = Get-AzADGroup -DisplayName $oldGroup.displayName
     $content | ForEach-Object -Process {
@@ -419,7 +419,7 @@ $groupList = Get-Content groupList.json | ConvertFrom-Json
 Get-ChildItem -Filter groupOwner-*.json | ForEach-Object {
 	$content = Get-Content $_.FullName | ConvertFrom-Json
     $groupObjectId = $_.name.Substring(11, 36)
-    $oldGroup = $groupList | where-Object {$_.ObjectId -eq $groupObjectId}
+    $oldGroup = $groupList | where-Object {$_.id -eq $groupObjectId}
     Write-Host "Checking owners for group " $oldGroup.displayName
     $group = Get-AzADGroup -DisplayName $oldGroup.displayName
     $content | ForEach-Object -Process {
