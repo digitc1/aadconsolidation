@@ -192,7 +192,7 @@ ForEach($AzADApp in $AzAdApps){
 
         #Exposed API's
         Try{
-            If(!($null -eq $AzAdApp.identifierUris)){
+            If(!(0 -eq $AzAdApp.identifierUris.Length)){
 		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
 		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
 	    } else {
