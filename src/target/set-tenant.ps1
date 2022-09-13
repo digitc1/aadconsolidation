@@ -233,13 +233,13 @@ ForEach($AzADApp in $AzAdApps){
 		Write-Host "Setting logoutUrl" -ForegroundColor Green
 	}
 
-        Start-sleep -seconds 20
+        Start-sleep -seconds 30
 	
 	 #Exposed API's
         Try{
             If(!(0 -eq $AzAdApp.identifierUris.Length)){
-		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
-		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.Id)"
+		Write-Host "Added the identifier Uri: api://$($NewApp.Id)" -ForegroundColor Green
 	    } else {
 			Write-Host "No identifier URI specified" -ForegroundColor Green
 	    }
