@@ -190,18 +190,6 @@ ForEach($AzADApp in $AzAdApps){
 		Write-Host "Skip public clients because app identifier uris is empty"
 	}
 
-        #Exposed API's
-        Try{
-            If(!(0 -eq $AzAdApp.identifierUris.Length)){
-		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
-		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
-	    } else {
-			Write-Host "No identifier URI specified" -ForegroundColor Green
-	    }
-        }Catch{
-            Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
-        }
-
         $EmptyScopes = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
 
         $CurrentScope = $NewApp.Oauth2Permissions
@@ -246,6 +234,18 @@ ForEach($AzADApp in $AzAdApps){
 	}
 
         Start-sleep -seconds 20
+	
+	 #Exposed API's
+        Try{
+            If(!(0 -eq $AzAdApp.identifierUris.Length)){
+		Set-azureadapplication -ObjectId $NewApp.ObjectId -IdentifierUris "api://$($NewApp.AppId)"
+		Write-Host "Added the identifier Uri: api://$($NewApp.AppId)" -ForegroundColor Green
+	    } else {
+			Write-Host "No identifier URI specified" -ForegroundColor Green
+	    }
+        }Catch{
+            Write-host "Following error was encountered: " $error[0].Exception.ErrorContent.Message.value -ForegroundColor Red
+        }
 	
 	 #Implicit ID Token
         #$StateIdToken = az ad app list --app-id $AzADApp.appId | ConvertFrom-Json     
