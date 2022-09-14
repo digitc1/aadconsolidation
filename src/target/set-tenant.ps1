@@ -369,7 +369,7 @@ Write-Host "checking user assigned identities" -ForegroundColor yellow
 $userAssignedIdentities = Get-Content useridentity.json | ConvertFrom-Json
 $userAssignedIdentities | ForEach-Object -Process {
 	Write-Host "checking user assigned identity $_.name"
-	New-AzUserAssignedIdentity -ResourceGroupName $_.resourceGroup -Name $_.name
+	New-AzUserAssignedIdentity -ResourceGroupName $_.resourceGroup -Name $_.name -Location "westeurope"
 }
 
 # Recreate Groups
