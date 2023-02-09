@@ -4,7 +4,7 @@
 # Switch to the correct subscription
 if [ "$1" ]; then
 	list=$(az account show --subscription $1 --query id --output tsv);
-	echo "Subscription successfully loaded:" $test
+	echo "Subscription successfully loaded:" $1
 else
 	list=$(az account list --query [].id --output tsv)
 	echo "Loading all subscriptions"
